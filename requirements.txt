@@ -1,1 +1,2 @@
+flake8-isort==2.4
 selenium==3.4.3
