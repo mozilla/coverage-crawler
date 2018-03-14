@@ -27,16 +27,18 @@ try:
 except ImportError:
     from urllib import urlretrieve
 
-
+# Retrieving task from index
 index = taskcluster.Index()
 taskId = index.findTask('gecko.v2.mozilla-central.' +
                         'latest.firefox.linux64-ccov-opt')['taskId']
+# Retrieving artifact from Queue
 queue = taskcluster.Queue()
 url = queue.buildUrl('getLatestArtifact', taskId,
                      'public/build/target.tar.bz2')
 name = os.path.join('ccov-artifacts', taskId +
                     'artifacts.public.build.target.tar.bz2')
 urlretrieve(url, name)
+<<<<<<< 8b47a9f09fcbb0ec4d978d66b1061afde1554a0f
 <<<<<<< c43ebd63c26dd0a52d2fb192873e0cd6fdbbe52f
 tar = tarfile.open(name, 'r:bz2')
 tar.extractall()
@@ -47,6 +49,9 @@ tar.close()
 =======
 >>>>>>> implemented with taskcluster API
 =======
+=======
+# Extracting artifact
+>>>>>>> sections added
 with tarfile.open(name, 'r:bz2') as tar:
     tar.extractall()
 >>>>>>> added context manager, checked with flake8
