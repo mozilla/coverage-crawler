@@ -1,6 +1,8 @@
-import tarfile
 import os
+import tarfile
+
 import taskcluster
+
 try:
     from urllib.request import urlretrieve
 except ImportError:
