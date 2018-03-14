@@ -20,27 +20,24 @@ with tarfile.open(name, 'r:bz2') as tar:
     tar.extractall()
 =======
 import tarfile
-import sys
 import os
 import taskcluster
 try:
-    from urllib.parse import urlencode
-    from urllib.request import urlopen, urlretrieve
+    from urllib.request import urlretrieve
 except ImportError:
-    from urllib import urlencode, urlretrieve
-    from urllib2 import urlopen
+    from urllib import urlretrieve
 
 
 index = taskcluster.Index()
+taskId = index.findTask('gecko.v2.mozilla-central.' +
+                        'latest.firefox.linux64-ccov-opt')['taskId']
 queue = taskcluster.Queue()
-route = "gecko.v2.mozilla-central.latest.firefox.linux64-ccov-opt"
-taskId = index.findTask(route)['taskId']
-artifactName = 'public/build/target.tar.bz2'
+url = queue.buildUrl('getLatestArtifact', taskId,
+                     'public/build/target.tar.bz2')
 name = os.path.join('ccov-artifacts', taskId +
                     'artifacts.public.build.target.tar.bz2')
-url = queue.buildUrl('getLatestArtifact', taskId, artifactName)
-print(url)
 urlretrieve(url, name)
+<<<<<<< c43ebd63c26dd0a52d2fb192873e0cd6fdbbe52f
 tar = tarfile.open(name, 'r:bz2')
 tar.extractall()
 tar.close()
@@ -49,4 +46,8 @@ tar.close()
 >>>>>>> download the latest Firefox coverage build
 =======
 >>>>>>> implemented with taskcluster API
+=======
+with tarfile.open(name, 'r:bz2') as tar:
+    tar.extractall()
+>>>>>>> added context manager, checked with flake8
 os.remove(name)
