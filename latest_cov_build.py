@@ -1,3 +1,4 @@
+<<<<<<< c37f3812229c1a1a3d771aa145c747a73b41cafb
 <<<<<<< 835b3e8d057109aebc9eaf465a0e161a305c71f7
 import os
 import tarfile
@@ -20,8 +21,13 @@ with tarfile.open(name, 'r:bz2') as tar:
     tar.extractall()
 =======
 import tarfile
+=======
+>>>>>>> flake isort imports cleanup
 import os
+import tarfile
+
 import taskcluster
+
 try:
     from urllib.request import urlretrieve
 except ImportError:
