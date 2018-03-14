@@ -26,14 +26,13 @@ import tarfile
 import os
 import tarfile
 
-import taskcluster
-
 try:
     from urllib.request import urlretrieve
 except ImportError:
     from urllib import urlretrieve
 
 
+<<<<<<< 6bdff2dcd16cdc6a4f4437272c6e77eac0a31738
 # Retrieving task from index
 index = taskcluster.Index()
 taskId = index.findTask('gecko.v2.mozilla-central.' +
@@ -56,11 +55,20 @@ tar.close()
 =======
 =======
 =======
+=======
+name = os.path.join('ccov-artifacts',
+                    'latest.artifacts.public.build.target.tar.bz2')
+
+>>>>>>> fixed issues
 # Retrieving artifact
 urlretrieve('https://index.taskcluster.net/v1/task/gecko.v2.' +
             'mozilla-central.latest.firefox.linux64-ccov-opt/' +
             'artifacts/public/build/target.tar.bz2', name)
+<<<<<<< 6bdff2dcd16cdc6a4f4437272c6e77eac0a31738
 >>>>>>> changed urlretreve arguments
+=======
+
+>>>>>>> fixed issues
 # Extracting artifact
 >>>>>>> sections added
 with tarfile.open(name, 'r:bz2') as tar:
