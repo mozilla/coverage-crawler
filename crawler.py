@@ -181,8 +181,6 @@ os.environ['PATH'] += os.pathsep + os.path.abspath('tools')
 os.environ['MOZ_HEADLESS'] = '1'
 
 # Webdriver uses Firefox Binaries from downloaded cov build
-my_path = os.path.abspath(os.path.dirname(__file__))
-filename = os.path.join(my_path, 'firefox/firefox-bin')
-driver = webdriver.Firefox(firefox_binary=filename)
+driver = webdriver.Firefox(firefox_binary='firefox/firefox-bin')
 
 run_all(driver)
