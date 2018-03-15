@@ -3,11 +3,9 @@
 
 A crawler to find websites that exercise code in Firefox that is not covered by unit tests
 
-## Usage on local machine
+## Usage
 
-- Create and activate Python 3.6 virtual environment
-- In the virtual environment install requirements for the project running `pip install -r requirements`
-- To install testing utilities run `pip install -r test-requirements.txt`
-- If you want to test Python file with Flake8 run `flake8 name_or_file.py`
-- run `latest_cov_build.py` to download the latest coverage build of Firefox
-- run `crawler.py` 
+- Install requirements for the project running `pip install -r requirements` command if you only want to run project;
+- Install testing utilities requirements with `pip install -r test-requirements.txt` command if you want to develop;
+- Run the `latest_cov_build.py` script to download the latest Firefox coverage build;
+- Run the `crawler.py` script.
