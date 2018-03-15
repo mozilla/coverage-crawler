@@ -179,6 +179,8 @@ def run_all(driver):
 
 os.environ['PATH'] += os.pathsep + os.path.abspath('tools')
 os.environ['MOZ_HEADLESS'] = '1'
-driver = webdriver.Firefox(firefox_binary='tools/nightly/firefox-bin')
+
+# Webdriver uses Firefox Binaries from downloaded cov build
+driver = webdriver.Firefox(firefox_binary='firefox/firefox-bin')
 
 run_all(driver)
