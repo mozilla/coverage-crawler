@@ -7,8 +7,7 @@ except ImportError:
     from urllib import urlretrieve
 
 
-name = os.path.join('ccov-artifacts',
-                    'latest.artifacts.public.build.target.tar.bz2')
+name = 'latest.artifacts.public.build.target.tar.bz2'
 
 # Retrieving artifact
 urlretrieve('https://index.taskcluster.net/v1/task/gecko.v2.' +
