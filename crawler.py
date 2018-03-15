@@ -8,6 +8,9 @@ from selenium import webdriver
 from selenium.common.exceptions import (
     NoAlertPresentException, NoSuchWindowException, TimeoutException
 )
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+
+import latest_cov_build
 
 
 def set_timeouts(driver):
@@ -179,6 +182,14 @@ def run_all(driver):
 
 os.environ['PATH'] += os.pathsep + os.path.abspath('tools')
 os.environ['MOZ_HEADLESS'] = '1'
-driver = webdriver.Firefox(firefox_binary='tools/nightly/firefox-bin')
+
+# Download the latest Firefox coverage build
+latest_cov_build()
+
+# Webdriver uses Firefox Binaries from downloaded cov build
+my_path = os.path.abspath(os.path.dirname(__file__))
+filename = os.path.join(my_path, 'firefox/firefox-bin')
+binary = FirefoxBinary(filename)
+driver = webdriver.Firefox(firefox_binary=binary)
 
 run_all(driver)
