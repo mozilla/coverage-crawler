@@ -10,6 +10,7 @@ except ImportError:
 
 
 name = 'latest.artifacts.public.build.target.tar.bz2'
+<<<<<<< 8dc78ad82a97fc8bf7ceddab5d90a251851b3872
 
 # Retrieving artifact
 urlretrieve('https://index.taskcluster.net/v1/task/gecko.v2.' +
@@ -58,6 +59,8 @@ tar.close()
 =======
 name = os.path.join('ccov-artifacts',
                     'latest.artifacts.public.build.target.tar.bz2')
+=======
+>>>>>>> Update latest_cov_build.py
 
 >>>>>>> fixed issues
 # Retrieving artifact
