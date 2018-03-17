@@ -5,6 +5,7 @@ import tarfile
 import zipfile
 
 import requests
+import taskcluster
 
 try:
     from urllib.request import urlretrieve
@@ -12,17 +13,21 @@ except ImportError:
     from urllib import urlretrieve
 
 
-name = 'latest.artifacts.public.build.target.tar.bz2'
+index = taskcluster.Index()
+queue = taskcluster.Queue()
 
-# Retrieving artifact
-urlretrieve('https://index.taskcluster.net/v1/task/gecko.v2.' +
-            'mozilla-central.latest.firefox.linux64-ccov-opt/' +
-            'artifacts/public/build/target.tar.bz2', name)
+taskId = index.findTask('gecko.v2.mozilla-central.' +
+                        'latest.firefox.linux64-ccov-opt')['taskId']
 
-# Extracting artifact
-with tarfile.open(name, 'r:bz2') as tar:
+# Download artifacts
+for name in ['target.tar.bz2', 'target.code-coverage-gcno.zip', 'chrome-map.json']:
+    url = queue.buildUrl('getLatestArtifact', taskId, 'public/build/{}'.format(name))
+    urlretrieve(url, name)
+
+# Extracting coverage build artifact
+with tarfile.open('target.tar.bz2', 'r:bz2') as tar:
     tar.extractall()
-os.remove(name)
+os.remove('target.tar.bz2')
 
 # Geckodriver download
 # OS information for correct geckodriver version
