@@ -22,12 +22,12 @@ taskId = index.findTask('gecko.v2.mozilla-central.' +
 # Download artifacts
 for name in ['target.tar.bz2', 'target.code-coverage-gcno.zip', 'chrome-map.json']:
     url = queue.buildUrl('getLatestArtifact', taskId, 'public/build/{}'.format(name))
-    urlretrieve(url, name)
+    urlretrieve(url, os.path.join('tools', name))
 
 # Extracting coverage build artifact
-with tarfile.open('target.tar.bz2', 'r:bz2') as tar:
-    tar.extractall()
-os.remove('target.tar.bz2')
+with tarfile.open('tools/target.tar.bz2', 'r:bz2') as tar:
+    tar.extractall(path='tools')
+os.remove('tools/target.tar.bz2')
 
 # Geckodriver download
 # OS information for correct geckodriver version
