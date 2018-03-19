@@ -1,6 +1,8 @@
 import json
 import os
 import random
+import sys
+import tempfile
 import time
 import traceback
 
@@ -177,6 +179,20 @@ def run_all(driver):
     driver.quit()
 
 
+# Environmental vars set to overwrite default location of .gcda files
+if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
+    prefix = '/builds/worker/workspace/build/src/'
+    strip_count = prefix.count('/')
+elif sys.platform.startswith('cygwin') or sys.platform.startswith('win32'):
+    prefix = 'z:/build/build/src/'
+    strip_count = prefix.count('/') + 1
+
+# Remove a prefix from the path where .gcda files are stored
+os.environ['GCOV_PREFIX_STRIP'] = str(strip_count)
+
+# Returns absolute path for created temp file
+gcov_dir = tempfile.mkdtemp()
+os.environ['GCOV_PREFIX'] = gcov_dir
 os.environ['PATH'] += os.pathsep + os.path.abspath('tools')
 os.environ['MOZ_HEADLESS'] = '1'
 
