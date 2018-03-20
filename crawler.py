@@ -190,13 +190,12 @@ elif sys.platform.startswith('cygwin') or sys.platform.startswith('win32'):
 # Remove a prefix from the path where .gcda files are stored
 os.environ['GCOV_PREFIX_STRIP'] = str(strip_count)
 
-# Environment variable for JS engine to emit JS coverage information
-jsvm_dir = tempfile.mkdtemp()
-os.environ['JS_CODE_COVERAGE_OUTPUT_DIR'] = self.jsvm_dir
-
 # Returns absolute path for created temp file
 gcov_dir = tempfile.mkdtemp()
 os.environ['GCOV_PREFIX'] = gcov_dir
+# Environment variable for JS engine to emit JS coverage information
+jsvm_dir = tempfile.mkdtemp()
+os.environ['JS_CODE_COVERAGE_OUTPUT_DIR'] = jsvm_dir
 os.environ['PATH'] += os.pathsep + os.path.abspath('tools')
 os.environ['MOZ_HEADLESS'] = '1'
 
