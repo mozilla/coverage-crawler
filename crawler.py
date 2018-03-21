@@ -189,17 +189,12 @@ elif sys.platform.startswith('cygwin') or sys.platform.startswith('win32'):
 
 # Remove a prefix from the path where .gcda files are stored
 os.environ['GCOV_PREFIX_STRIP'] = str(strip_count)
-
-# Returns absolute path for created temp file
-gcov_dir = tempfile.mkdtemp()
-os.environ['GCOV_PREFIX'] = gcov_dir
-# Environment variable for JS engine to emit JS coverage information
-jsvm_dir = tempfile.mkdtemp()
-os.environ['JS_CODE_COVERAGE_OUTPUT_DIR'] = jsvm_dir
 os.environ['PATH'] += os.pathsep + os.path.abspath('tools')
 os.environ['MOZ_HEADLESS'] = '1'
-
-# Webdriver uses Firefox Binaries from downloaded cov build
-driver = webdriver.Firefox(firefox_binary='tools/firefox/firefox-bin')
-
-run_all(driver)
+# create a temporary directory using the context manager
+with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as jsvm_dir:
+    os.environ['GCOV_PREFIX'] = gcov_dir
+    os.environ['JS_CODE_COVERAGE_OUTPUT_DIR'] = jsvm_dir
+    # Webdriver uses Firefox Binaries from downloaded cov build
+    driver = webdriver.Firefox(firefox_binary='tools/firefox/firefox-bin')
+    run_all(driver)
