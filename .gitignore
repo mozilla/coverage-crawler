@@ -102,3 +102,6 @@ ENV/
 
 data/
 tools/
+
+# pytest
+.pytest_cache/
