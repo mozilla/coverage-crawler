@@ -1,6 +1,8 @@
 import json
 import os
 import random
+import shutil
+import subprocess
 import sys
 import tempfile
 import time
@@ -191,10 +193,26 @@ elif sys.platform.startswith('cygwin') or sys.platform.startswith('win32'):
 os.environ['GCOV_PREFIX_STRIP'] = str(strip_count)
 os.environ['PATH'] += os.pathsep + os.path.abspath('tools')
 os.environ['MOZ_HEADLESS'] = '1'
+
 # create a temporary directory using the context manager
 with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as jsvm_dir:
     os.environ['GCOV_PREFIX'] = gcov_dir
     os.environ['JS_CODE_COVERAGE_OUTPUT_DIR'] = jsvm_dir
+
     # Webdriver uses Firefox Binaries from downloaded cov build
     driver = webdriver.Firefox(firefox_binary='tools/firefox/firefox-bin')
     run_all(driver)
+
+    # Zip gcda file from gcov directory
+    shutil.make_archive('code-coverage-gcda', 'zip', gcov_dir)
+    grcov_command = [
+        os.path.join('tools', 'grcov'),
+        '-t', 'coveralls+',
+        '-p', prefix,
+        os.path.join('tools', 'target.code-coverage-gcno.zip'), 'code-coverage-gcda.zip',
+        '--token', 'UNUSED',
+        '--commit-sha', 'UNUSED'
+    ]
+    with open('output.json', "w+") as outfile:
+        subprocess.check_call(grcov_command, stdout=outfile)
+    os.remove('code-coverage-gcda.zip')
