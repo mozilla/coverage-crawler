@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import json
 import os
 import random
@@ -213,6 +215,6 @@ with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as
         '--token', 'UNUSED',
         '--commit-sha', 'UNUSED'
     ]
-    with open('output.json', "w+") as outfile:
+    with open('output.json', 'w+') as outfile:
         subprocess.check_call(grcov_command, stdout=outfile)
     os.remove('code-coverage-gcda.zip')
