@@ -3,7 +3,7 @@ python:
   - 3.6
 install:
   - pip install -r requirements.txt
-  - pip install -r test-requirements.txt 
+  - pip install -r test-requirements.txt
 script:
   - flake8 .
   - python -m pytest test/test_*.py
