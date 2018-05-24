@@ -19,7 +19,7 @@ def compare_source_files_objects(obj1, obj2):
             for i, j in zip(obj1['coverage'], obj2['coverage']):
                 if j is not None and j is not 0 and j >= i:
                     i = j - i
-                elif j is 0:
+                elif i is not None:
                     i = 0
                 list_val.append(i)
             obj1['coverage'] = list_val
