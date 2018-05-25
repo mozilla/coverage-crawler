@@ -1,6 +1,17 @@
 # -*- coding: utf-8 -*-
 
 
+def diff_line(i, j):
+    if j is None:
+        return None
+    elif i is None:
+        return j
+    elif j > 0 and j >= i:
+        return j - i
+    else:
+        return 0
+
+
 def compare_source_files_objects(obj1, obj2):
     diff_funcs = []
     if obj1['name'] == obj2['name']:
@@ -14,18 +25,7 @@ def compare_source_files_objects(obj1, obj2):
                             if func1['exec'] is False and func2['exec'] is True:
                                 diff_funcs.append(func2)
                 obj1['functions'] = diff_funcs
-            list_val = []
-            for k, m in zip(obj1['coverage'], obj2['coverage']):
-                if m is None:
-                    i = None
-                elif k is None:
-                    i = m
-                elif m > 0 and m >= k:
-                    i = m - k
-                else:
-                    i = 0
-                list_val.append(i)
-            obj1['coverage'] = list_val
+            obj1['coverage'] = [diff_line(k, m) for k, m in zip(obj1['coverage'], obj2['coverage'])]
             return obj1
     return None
 
