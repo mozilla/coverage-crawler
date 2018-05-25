@@ -17,14 +17,14 @@ def compare_source_files_objects(obj1, obj2):
             list_val = []
             for k, m in zip(obj1['coverage'], obj2['coverage']):
                 if m is None:
-                    k = None
+                    i = None
                 elif k is None:
-                    k = m
+                    i = m
                 elif m > 0 and m >= k:
-                    k = m - k
+                    i = m - k
                 else:
-                    k = 0
-                list_val.append(k)
+                    i = 0
+                list_val.append(i)
             obj1['coverage'] = list_val
             return obj1
     return None
