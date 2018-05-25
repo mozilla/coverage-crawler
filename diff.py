@@ -12,16 +12,19 @@ def compare_source_files_objects(obj1, obj2):
                     for func2 in obj2['functions']:
                         if func1['name'] == func2['name']:
                             if func1['exec'] is False and func2['exec'] is True:
-                                func1['exec'] = True
-                                diff_funcs.append(func1)
+                                diff_funcs.append(func2)
                 obj1['functions'] = diff_funcs
             list_val = []
-            for i, j in zip(obj1['coverage'], obj2['coverage']):
-                if j is not None and j is not 0 and j >= i:
-                    i = j - i
-                elif i is not None:
-                    i = 0
-                list_val.append(i)
+            for k, m in zip(obj1['coverage'], obj2['coverage']):
+                if m is None:
+                    k = None
+                elif k is None:
+                    k = m
+                elif m > 0 and m >= k:
+                    k = m - k
+                else:
+                    k = 0
+                list_val.append(k)
             obj1['coverage'] = list_val
             return obj1
     return None
