@@ -32,7 +32,7 @@ index = taskcluster.Index()
 queue = taskcluster.Queue()
 
 taskId = index.findTask('gecko.v2.mozilla-central.' +
-                        'latest.firefox.linux64-ccov-opt')['taskId']
+                        'latest.firefox.linux64-ccov-debug')['taskId']
 
 # Download artifacts
 for name in ['target.tar.bz2', 'target.code-coverage-gcno.zip', 'chrome-map.json']:
