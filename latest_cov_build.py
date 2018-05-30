@@ -6,6 +6,7 @@ import sys
 import tarfile
 import zipfile
 
+import codecoverage
 import requests
 import taskcluster
 
@@ -89,3 +90,9 @@ for filename in ['tools/target.code-coverage-gcno.zip', 'tools/target.tar.bz2', 
         with tarfile.open(filename, mode) as tar:
             tar.extractall(path='tools')
     os.remove(filename)
+
+# Download Firefox coverage report
+codecoverage.download_coverage_artifacts(taskId, None)
+codecoverage.generate_info('tools/grcov')
+codecoverage.download_genhtml()
+codecoverage.generate_report('tools/firefox')
