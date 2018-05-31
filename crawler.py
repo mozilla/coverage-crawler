@@ -11,9 +11,9 @@ import time
 import traceback
 
 from selenium import webdriver
-from selenium.common.exceptions import (
-    NoAlertPresentException, NoSuchWindowException, TimeoutException
-)
+from selenium.common.exceptions import NoAlertPresentException
+from selenium.common.exceptions import NoSuchWindowException
+from selenium.common.exceptions import TimeoutException
 
 
 def set_timeouts(driver):
