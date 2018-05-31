@@ -93,6 +93,4 @@ for filename in ['tools/target.code-coverage-gcno.zip', 'tools/target.tar.bz2', 
 
 # Download Firefox coverage report
 codecoverage.download_coverage_artifacts(taskId, None)
-codecoverage.generate_info('tools/grcov')
-codecoverage.download_genhtml()
-codecoverage.generate_report('tools/firefox')
+codecoverage.generate_report('tools/grcov', 'coveralls+', 'firefox_report.json')
