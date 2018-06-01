@@ -163,22 +163,23 @@ def run(website, driver):
     return saved_sequence
 
 
-def run_all(driver):
+def run_all(driver, data_folder):
     set_timeouts(driver)
 
-    if not os.path.exists('data'):
-        os.makedirs('data')
+    if not os.path.exists(data_folder):
+        os.makedirs(data_folder)
 
     websites = ['https://www.mozilla.org/']
 
     for i, website in enumerate(websites):
-        if os.path.exists('data/{}.txt'.format(i)):
+        if os.path.exists('{}/{}.txt'.format(data_folder, i)):
             continue
 
         try:
             sequence = run(website, driver)
 
-            with open('data/{}.txt'.format(i), 'w') as f:
+            with open('{}/{}.txt'.format(data_folder, i), 'w') as f:
+                print("here")
                 f.write('Website name: ' + website + '\n')
                 for element in sequence:
                     f.write(json.dumps(element) + '\n')
@@ -211,12 +212,9 @@ with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as
     # Webdriver uses Firefox Binaries from downloaded cov build
     driver = webdriver.Firefox(firefox_binary='tools/firefox/firefox-bin')
 
-    # All steps are stored in data folder
-    run_all(driver)
-    random_name_for_folder = str(uuid.uuid4())
-
-    # Move steps from data to new folder
-    shutil.copytree('data', random_name_for_folder)
+    # All steps are stored in new folder
+    data_folder = str(uuid.uuid4())
+    run_all(driver, data_folder)
 
     # Zip gcda file from gcov directory
     shutil.make_archive('code-coverage-gcda', 'zip', gcov_dir)
@@ -238,8 +236,7 @@ with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as
 
     # Create diff report
     diff_report = diff.compare_reports(baseline_report, report)
-    with open('{}/diff.json'.format(random_name_for_folder), 'w') as outfile:
+    with open('{}/diff.json'.format(data_folder), 'w') as outfile:
         json.dump(diff_report, outfile)
 
-    shutil.rmtree('data')
     os.remove('code-coverage-gcda.zip')
