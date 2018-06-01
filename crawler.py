@@ -9,11 +9,14 @@ import sys
 import tempfile
 import time
 import traceback
+import uuid
 
 from selenium import webdriver
 from selenium.common.exceptions import NoAlertPresentException
 from selenium.common.exceptions import NoSuchWindowException
 from selenium.common.exceptions import TimeoutException
+
+import diff
 
 
 def set_timeouts(driver):
@@ -160,19 +163,23 @@ def run(website, driver):
     return saved_sequence
 
 
-def run_all(driver):
+def run_all(driver, data_folder):
     set_timeouts(driver)
+
+    if not os.path.exists(data_folder):
+        os.makedirs(data_folder)
 
     websites = ['https://www.mozilla.org/']
 
     for i, website in enumerate(websites):
-        if os.path.exists('data/{}.txt'.format(i)):
+        if os.path.exists('{}/{}.txt'.format(data_folder, i)):
             continue
 
         try:
             sequence = run(website, driver)
 
-            with open('data/{}.txt'.format(i), 'w') as f:
+            with open('{}/{}.txt'.format(data_folder, i), 'w') as f:
+                f.write('Website name: ' + website + '\n')
                 for element in sequence:
                     f.write(json.dumps(element) + '\n')
 
@@ -203,7 +210,10 @@ with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as
 
     # Webdriver uses Firefox Binaries from downloaded cov build
     driver = webdriver.Firefox(firefox_binary='tools/firefox/firefox-bin')
-    run_all(driver)
+
+    # All steps are stored in new folder
+    data_folder = str(uuid.uuid4())
+    run_all(driver, data_folder)
 
     # Zip gcda file from gcov directory
     shutil.make_archive('code-coverage-gcda', 'zip', gcov_dir)
@@ -215,6 +225,17 @@ with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as
         '--token', 'UNUSED',
         '--commit-sha', 'UNUSED'
     ]
+
     with open('output.json', 'w+') as outfile:
         subprocess.check_call(grcov_command, stdout=outfile)
+
+    with open('tests_report.json') as baseline_rep, open('output.json') as rep:
+        baseline_report = json.load(baseline_rep)
+        report = json.load(rep)
+
+    # Create diff report
+    diff_report = diff.compare_reports(baseline_report, report)
+    with open('{}/diff.json'.format(data_folder), 'w') as outfile:
+        json.dump(diff_report, outfile)
+
     os.remove('code-coverage-gcda.zip')
