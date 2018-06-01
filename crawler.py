@@ -179,7 +179,6 @@ def run_all(driver, data_folder):
             sequence = run(website, driver)
 
             with open('{}/{}.txt'.format(data_folder, i), 'w') as f:
-                print("here")
                 f.write('Website name: ' + website + '\n')
                 for element in sequence:
                     f.write(json.dumps(element) + '\n')
