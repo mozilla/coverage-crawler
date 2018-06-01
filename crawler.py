@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 
-import datetime
 import json
 import os
 import random
 import shutil
-import string
 import subprocess
 import sys
 import tempfile
 import time
 import traceback
+import uuid
 
 from selenium import webdriver
 from selenium.common.exceptions import NoAlertPresentException
@@ -180,6 +179,7 @@ def run_all(driver):
             sequence = run(website, driver)
 
             with open('data/{}.txt'.format(i), 'w') as f:
+                f.write('Website name: ' + website + '\n')
                 for element in sequence:
                     f.write(json.dumps(element) + '\n')
 
@@ -213,12 +213,10 @@ with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as
 
     # All steps are stored in data folder
     run_all(driver)
-    random_name_for_folder = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
-    date_str = str(datetime.datetime.now().strftime(' %Y-%m-%d %H:%M:%S'))
-    random_name_for_folder += date_str
+    random_name_for_folder = str(uuid.uuid4())
 
     # Move steps from data to new folder
-    shutil.copytree('data', random_name_for_folder, symlinks=False, ignore=None)
+    shutil.copytree('data', random_name_for_folder)
 
     # Zip gcda file from gcov directory
     shutil.make_archive('code-coverage-gcda', 'zip', gcov_dir)
