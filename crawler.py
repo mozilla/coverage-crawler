@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import datetime
 import json
 import os
 import random
 import shutil
+import string
 import subprocess
 import sys
 import tempfile
@@ -14,6 +16,8 @@ from selenium import webdriver
 from selenium.common.exceptions import NoAlertPresentException
 from selenium.common.exceptions import NoSuchWindowException
 from selenium.common.exceptions import TimeoutException
+
+import diff
 
 
 def set_timeouts(driver):
@@ -163,6 +167,9 @@ def run(website, driver):
 def run_all(driver):
     set_timeouts(driver)
 
+    if not os.path.exists('data'):
+        os.makedirs('data')
+
     websites = ['https://www.mozilla.org/']
 
     for i, website in enumerate(websites):
@@ -203,7 +210,15 @@ with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as
 
     # Webdriver uses Firefox Binaries from downloaded cov build
     driver = webdriver.Firefox(firefox_binary='tools/firefox/firefox-bin')
+
+    # All steps are stored in data folder
     run_all(driver)
+    random_name_for_folder = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
+    date_str = str(datetime.datetime.now().strftime(' %Y-%m-%d %H:%M:%S'))
+    random_name_for_folder += date_str
+
+    # Move steps from data to new folder
+    shutil.copytree('data', random_name_for_folder, symlinks=False, ignore=None)
 
     # Zip gcda file from gcov directory
     shutil.make_archive('code-coverage-gcda', 'zip', gcov_dir)
@@ -215,6 +230,18 @@ with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as
         '--token', 'UNUSED',
         '--commit-sha', 'UNUSED'
     ]
+
     with open('output.json', 'w+') as outfile:
         subprocess.check_call(grcov_command, stdout=outfile)
+
+    with open('tests_report.json') as baseline_rep, open('output.json') as rep:
+        baseline_report = json.load(baseline_rep)
+        report = json.load(rep)
+
+    # Create diff report
+    diff_report = diff.compare_reports(baseline_report, report)
+    with open('{}/diff.json'.format(random_name_for_folder), 'w') as outfile:
+        json.dump(diff_report, outfile)
+
+    shutil.rmtree('data')
     os.remove('code-coverage-gcda.zip')
