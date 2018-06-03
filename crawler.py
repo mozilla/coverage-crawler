@@ -168,7 +168,7 @@ def run_all(driver, data_folder):
 
     if not os.path.exists(data_folder):
         os.makedirs(data_folder)
-    
+
     with open('websites.txt') as f:
         websites = list(f)
 
@@ -180,7 +180,6 @@ def run_all(driver, data_folder):
             sequence = run(website, driver)
 
             with open('{}/{}.txt'.format(data_folder, i), 'w') as f:
-                print("here")
                 f.write('Website name: ' + website + '\n')
                 for element in sequence:
                     f.write(json.dumps(element) + '\n')
