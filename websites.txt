@@ -1,0 +1,5 @@
+https://stackoverflow.com/
+https://www.mozilla.org/
+https://www.python.org/
+https://www.rust-lang.org/
+https://www.wikipedia.org/

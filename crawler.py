@@ -169,23 +169,22 @@ def run_all(driver, data_folder):
     if not os.path.exists(data_folder):
         os.makedirs(data_folder)
 
-    websites = ['https://www.mozilla.org/']
+    with open('websites.txt') as f:
+        for i, website in enumerate(f):
+            if os.path.exists('{}/{}.txt'.format(data_folder, i)):
+                continue
 
-    for i, website in enumerate(websites):
-        if os.path.exists('{}/{}.txt'.format(data_folder, i)):
-            continue
+            try:
+                sequence = run(website, driver)
 
-        try:
-            sequence = run(website, driver)
+                with open('{}/{}.txt'.format(data_folder, i), 'w') as f:
+                    f.write('Website name: ' + website + '\n')
+                    for element in sequence:
+                        f.write(json.dumps(element) + '\n')
 
-            with open('{}/{}.txt'.format(data_folder, i), 'w') as f:
-                f.write('Website name: ' + website + '\n')
-                for element in sequence:
-                    f.write(json.dumps(element) + '\n')
-
-        except:  # noqa: E722
-            traceback.print_exc()
-            close_all_windows_except_first(driver)
+            except:  # noqa: E722
+                traceback.print_exc()
+                close_all_windows_except_first(driver)
 
     driver.quit()
 
