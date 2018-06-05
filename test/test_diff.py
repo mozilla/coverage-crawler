@@ -111,13 +111,7 @@ def test_compare_objects_same_coverage_diff_functions():
         'functions': [],
         'branches': [],
         'name': 'obj-firefox/dist/include/mozilla/dom/DOMRectListBinding.h',
-        'coverage': [
-            None,
-            0,
-            None,
-            None,
-            0
-        ],
+        'coverage': [],
         'source_digest': 'another_generated_number_with_literals'
     }
 
