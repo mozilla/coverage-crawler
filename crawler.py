@@ -221,6 +221,7 @@ with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as
         '-t', 'coveralls+',
         '-p', prefix,
         os.path.join('tools', 'target.code-coverage-gcno.zip'), 'code-coverage-gcda.zip',
+        '--filter', 'covered',
         '--token', 'UNUSED',
         '--commit-sha', 'UNUSED'
     ]
