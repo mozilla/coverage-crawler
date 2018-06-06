@@ -102,7 +102,3 @@ ENV/
 
 data/
 tools/
-ccov-artifacts/
-*.zip
-tests_report.json
-output.json
