@@ -107,13 +107,7 @@ def test_compare_objects_same_coverage_diff_functions():
         'source_digest': 'another_generated_number_with_literals2'
     }
 
-    assert diff.compare_source_files_objects(obj1, obj2) == {
-        'functions': [],
-        'branches': [],
-        'name': 'obj-firefox/dist/include/mozilla/dom/DOMRectListBinding.h',
-        'coverage': [],
-        'source_digest': 'another_generated_number_with_literals'
-    }
+    assert diff.compare_source_files_objects(obj1, obj2) is None
 
 
 def test_compare_objects_diff_coverage_same_func():

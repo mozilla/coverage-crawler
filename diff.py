@@ -14,41 +14,25 @@ def diff_line(i, j):
 
 def compare_source_files_objects(obj1, obj2):
     diff_funcs = []
+    diff_cov = []
     if obj1['name'] == obj2['name']:
-        are_funcs_equal = False
-        is_cov_equal = False
 
-        if obj1['coverage'] == obj2['coverage']:
-            is_cov_equal = True
-        if obj1['functions'] == obj2['functions']:
-            are_funcs_equal = True
+        if obj1['coverage'] != obj2['coverage']:
+            diff_cov = [diff_line(k, m) for k, m in zip(obj1['coverage'], obj2['coverage'])]
 
-        # both are different
-        if are_funcs_equal is False and is_cov_equal is False:
-            obj1['coverage'] = [diff_line(k, m) for k, m in zip(obj1['coverage'], obj2['coverage'])]
+        if obj1['functions'] != obj2['functions']:
             for func1 in obj1['functions']:
                 for func2 in obj2['functions']:
                     if func1['name'] == func2['name']:
                         if func1['exec'] is False and func2['exec'] is True:
                             diff_funcs.append(func2)
-            obj1['functions'] = diff_funcs
-        elif are_funcs_equal is True and is_cov_equal is False:
-            obj1['coverage'] = [diff_line(k, m) for k, m in zip(obj1['coverage'], obj2['coverage'])]
-            obj1['functions'] = []
-        elif are_funcs_equal is False and is_cov_equal is True:
-            for func1 in obj1['functions']:
-                for func2 in obj2['functions']:
-                    if func1['name'] == func2['name']:
-                        if func1['exec'] is False and func2['exec'] is True:
-                            diff_funcs.append(func2)
-            obj1['functions'] = diff_funcs
-            obj1['coverage'] = []
-        # both are same
-        else:
-            return None
+
+    if len(diff_funcs) == 0 and len(diff_cov) == 0:
+        return None
+    else:
+        obj1['coverage'] = diff_cov
+        obj1['functions'] = diff_funcs
         return obj1
-
-    return None
 
 
 def compare_reports(baseline_report, report):
