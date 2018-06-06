@@ -14,20 +14,25 @@ def diff_line(i, j):
 
 def compare_source_files_objects(obj1, obj2):
     diff_funcs = []
+    diff_cov = []
     if obj1['name'] == obj2['name']:
-        if obj1['functions'] != obj2['functions'] or obj1['coverage'] != obj2['coverage']:
-            if obj1['functions'] == obj2['functions']:
-                obj1['functions'] = []
-            if obj1['functions'] != obj2['functions']:
-                for func1 in obj1['functions']:
-                    for func2 in obj2['functions']:
-                        if func1['name'] == func2['name']:
-                            if func1['exec'] is False and func2['exec'] is True:
-                                diff_funcs.append(func2)
-                obj1['functions'] = diff_funcs
-            obj1['coverage'] = [diff_line(k, m) for k, m in zip(obj1['coverage'], obj2['coverage'])]
-            return obj1
-    return None
+
+        if obj1['coverage'] != obj2['coverage']:
+            diff_cov = [diff_line(k, m) for k, m in zip(obj1['coverage'], obj2['coverage'])]
+
+        if obj1['functions'] != obj2['functions']:
+            for func1 in obj1['functions']:
+                for func2 in obj2['functions']:
+                    if func1['name'] == func2['name']:
+                        if func1['exec'] is False and func2['exec'] is True:
+                            diff_funcs.append(func2)
+
+    if len(diff_funcs) == 0 and len(diff_cov) == 0:
+        return None
+    else:
+        obj1['coverage'] = diff_cov
+        obj1['functions'] = diff_funcs
+        return obj1
 
 
 def compare_reports(baseline_report, report):
