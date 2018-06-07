@@ -1,24 +1,24 @@
 # -*- coding: utf-8 -*-
 
 
-def diff_line(i, j):
+def diff_line(i, j, ignore_hits):
     if j is None:
         return None
     elif i is None:
         return j
-    elif j > 0 and j >= i:
+    elif j > 0 and j >= i and ignore_hits is False:
         return j - i
     else:
         return 0
 
 
-def compare_source_files_objects(obj1, obj2):
+def compare_source_files_objects(obj1, obj2, ignore_hits):
     diff_funcs = []
     diff_cov = []
     if obj1['name'] == obj2['name']:
 
         if obj1['coverage'] != obj2['coverage']:
-            diff_cov = [diff_line(k, m) for k, m in zip(obj1['coverage'], obj2['coverage'])]
+            diff_cov = [diff_line(k, m, ignore_hits) for k, m in zip(obj1['coverage'], obj2['coverage'])]
 
         if obj1['functions'] != obj2['functions']:
             for func1 in obj1['functions']:
@@ -35,14 +35,14 @@ def compare_source_files_objects(obj1, obj2):
         return obj1
 
 
-def compare_reports(baseline_report, report):
+def compare_reports(baseline_report, report, ignore_hits):
     baseline_coverage = baseline_report['source_files']
     coverage = report['source_files']
     source_files = []
     diff_report = {}
     for i in baseline_coverage:
         for j in coverage:
-            comp_result = compare_source_files_objects(i, j)
+            comp_result = compare_source_files_objects(i, j, ignore_hits)
             if comp_result is not None:
                 source_files.append(comp_result)
     diff_report['source_files'] = source_files

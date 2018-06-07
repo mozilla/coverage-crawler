@@ -236,7 +236,7 @@ with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as
         report = json.load(rep)
 
     # Create diff report
-    diff_report = diff.compare_reports(baseline_report, report)
+    diff_report = diff.compare_reports(baseline_report, report, True)
     with open('{}/diff.json'.format(data_folder), 'w') as outfile:
         json.dump(diff_report, outfile)
 
