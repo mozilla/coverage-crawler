@@ -8,6 +8,8 @@ def diff_line(i, j, ignore_hits):
         return j
     elif j > 0 and j >= i and ignore_hits is False:
         return j - i
+    elif j > i and i == 0 and ignore_hits is True:
+        return 1
     else:
         return 0
 

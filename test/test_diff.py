@@ -801,3 +801,115 @@ def test_compare_reports_ignore_hits():
             }
         ]
     }
+
+
+def test_compare_reports_ignore_hits_2():
+    baseline_report = {
+        'git': {
+            'branch': 'master',
+            'head': {
+                'id': 'UNUSED'
+            }
+        },
+        'repo_token': 'UNUSED',
+        'service_job_number': '',
+        'service_name': '',
+        'service_number': '',
+        'source_files': [
+            {
+                'functions': [
+                    {
+                        'name': 'func1',
+                        'start': 36,
+                        'exec': True
+                    },
+                    {
+                        'name': 'func2',
+                        'start': 64,
+                        'exec': False
+                    }
+                ],
+                'branches': [],
+                'name': 'obj-firefox/dist/include/mozilla/dom/DOMRectListBinding.h',
+                'coverage': [
+                    None,
+                    2,
+                    None,
+                    1,
+                    0
+                ],
+                'source_digest': 'another_generated_number_with_literals'
+            }
+        ]
+    }
+    report = {
+        'git': {
+            'branch': 'master',
+            'head': {
+                'id': 'UNUSED'
+            }
+        },
+        'repo_token': 'UNUSED',
+        'service_job_number': '',
+        'service_name': '',
+        'service_number': '',
+        'source_files': [
+            {
+                'functions': [
+                    {
+                        'name': 'func1',
+                        'start': 36,
+                        'exec': True
+                    },
+                    {
+                        'name': 'func2',
+                        'start': 64,
+                        'exec': True
+                    }
+                ],
+                'branches': [],
+                'name': 'obj-firefox/dist/include/mozilla/dom/DOMRectListBinding.h',
+                'coverage': [
+                    None,
+                    2,
+                    None,
+                    5,
+                    6
+                ],
+                'source_digest': 'another_generated_number_with_literals2'
+            }
+        ]
+    }
+    assert diff.compare_reports(baseline_report, report, True) == {
+        'git': {
+            'branch': 'master',
+            'head': {
+                'id': 'UNUSED'
+            }
+        },
+        'repo_token': 'UNUSED',
+        'service_job_number': '',
+        'service_name': '',
+        'service_number': '',
+        'source_files': [
+            {
+                'functions': [
+                    {
+                        'name': 'func2',
+                        'start': 64,
+                        'exec': True
+                    }
+                ],
+                'branches': [],
+                'name': 'obj-firefox/dist/include/mozilla/dom/DOMRectListBinding.h',
+                'coverage': [
+                    None,
+                    0,
+                    None,
+                    0,
+                    1
+                ],
+                'source_digest': 'another_generated_number_with_literals'
+            }
+        ]
+    }
