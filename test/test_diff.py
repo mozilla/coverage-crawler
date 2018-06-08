@@ -54,7 +54,7 @@ def test_compare_objects_same_coverage_same_functions():
         ],
         'source_digest': 'another_generated_number_with_literals'
     }
-    assert diff.compare_source_files_objects(obj1, obj2) is None
+    assert diff.compare_source_files_objects(obj1, obj2, False) is None
 
 
 def test_compare_objects_same_coverage_diff_functions():
@@ -107,7 +107,7 @@ def test_compare_objects_same_coverage_diff_functions():
         'source_digest': 'another_generated_number_with_literals2'
     }
 
-    assert diff.compare_source_files_objects(obj1, obj2) is None
+    assert diff.compare_source_files_objects(obj1, obj2, False) is None
 
 
 def test_compare_objects_diff_coverage_same_func():
@@ -160,7 +160,7 @@ def test_compare_objects_diff_coverage_same_func():
         'source_digest': 'another_generated_number_with_literals2'
     }
 
-    assert diff.compare_source_files_objects(obj1, obj2) == {
+    assert diff.compare_source_files_objects(obj1, obj2, False) == {
         'functions': [],
         'branches': [],
         'name': 'obj-firefox/dist/include/mozilla/dom/DOMRectListBinding.h',
@@ -226,7 +226,7 @@ def test_compare_objects_diff_coverage_same_func_2():
         'source_digest': 'another_generated_number_with_literals2'
     }
 
-    assert diff.compare_source_files_objects(obj1, obj2) == {
+    assert diff.compare_source_files_objects(obj1, obj2, False) == {
         'functions': [],
         'branches': [],
         'name': 'obj-firefox/dist/include/mozilla/dom/DOMRectListBinding.h',
@@ -291,7 +291,7 @@ def test_compare_objects_diff_coverage_diff_functions():
         'source_digest': 'another_generated_number_with_literals2'
     }
 
-    assert diff.compare_source_files_objects(obj1, obj2) == {
+    assert diff.compare_source_files_objects(obj1, obj2, False) == {
         'functions': [
             {
                 'name': 'func2',
@@ -389,7 +389,7 @@ def test_compare_reports():
             }
         ]
     }
-    assert diff.compare_reports(baseline_report, report) == {
+    assert diff.compare_reports(baseline_report, report, False) == {
         'git': {
             'branch': 'master',
             'head': {
@@ -550,7 +550,7 @@ def test_compare_reports_2_files():
         ]
     }
 
-    assert diff.compare_reports(baseline_report, report) == {
+    assert diff.compare_reports(baseline_report, report, False) == {
         'git': {
             'branch': 'master',
             'head': {
@@ -676,7 +676,7 @@ def test_compare_reports_no_diff():
         ]
     }
 
-    assert diff.compare_reports(baseline_report, report) == {
+    assert diff.compare_reports(baseline_report, report, False) == {
         'git': {
             'branch': 'master',
             'head': {
@@ -688,4 +688,228 @@ def test_compare_reports_no_diff():
         'service_name': '',
         'service_number': '',
         'source_files': []
+    }
+
+
+def test_compare_reports_ignore_hits():
+    baseline_report = {
+        'git': {
+            'branch': 'master',
+            'head': {
+                'id': 'UNUSED'
+            }
+        },
+        'repo_token': 'UNUSED',
+        'service_job_number': '',
+        'service_name': '',
+        'service_number': '',
+        'source_files': [
+            {
+                'functions': [
+                    {
+                        'name': 'func1',
+                        'start': 36,
+                        'exec': True
+                    },
+                    {
+                        'name': 'func2',
+                        'start': 64,
+                        'exec': False
+                    }
+                ],
+                'branches': [],
+                'name': 'obj-firefox/dist/include/mozilla/dom/DOMRectListBinding.h',
+                'coverage': [
+                    None,
+                    2,
+                    None,
+                    1,
+                    5
+                ],
+                'source_digest': 'another_generated_number_with_literals'
+            }
+        ]
+    }
+    report = {
+        'git': {
+            'branch': 'master',
+            'head': {
+                'id': 'UNUSED'
+            }
+        },
+        'repo_token': 'UNUSED',
+        'service_job_number': '',
+        'service_name': '',
+        'service_number': '',
+        'source_files': [
+            {
+                'functions': [
+                    {
+                        'name': 'func1',
+                        'start': 36,
+                        'exec': True
+                    },
+                    {
+                        'name': 'func2',
+                        'start': 64,
+                        'exec': True
+                    }
+                ],
+                'branches': [],
+                'name': 'obj-firefox/dist/include/mozilla/dom/DOMRectListBinding.h',
+                'coverage': [
+                    None,
+                    2,
+                    None,
+                    5,
+                    6
+                ],
+                'source_digest': 'another_generated_number_with_literals2'
+            }
+        ]
+    }
+    assert diff.compare_reports(baseline_report, report, True) == {
+        'git': {
+            'branch': 'master',
+            'head': {
+                'id': 'UNUSED'
+            }
+        },
+        'repo_token': 'UNUSED',
+        'service_job_number': '',
+        'service_name': '',
+        'service_number': '',
+        'source_files': [
+            {
+                'functions': [
+                    {
+                        'name': 'func2',
+                        'start': 64,
+                        'exec': True
+                    }
+                ],
+                'branches': [],
+                'name': 'obj-firefox/dist/include/mozilla/dom/DOMRectListBinding.h',
+                'coverage': [
+                    None,
+                    0,
+                    None,
+                    0,
+                    0
+                ],
+                'source_digest': 'another_generated_number_with_literals'
+            }
+        ]
+    }
+
+
+def test_compare_reports_ignore_hits_2():
+    baseline_report = {
+        'git': {
+            'branch': 'master',
+            'head': {
+                'id': 'UNUSED'
+            }
+        },
+        'repo_token': 'UNUSED',
+        'service_job_number': '',
+        'service_name': '',
+        'service_number': '',
+        'source_files': [
+            {
+                'functions': [
+                    {
+                        'name': 'func1',
+                        'start': 36,
+                        'exec': True
+                    },
+                    {
+                        'name': 'func2',
+                        'start': 64,
+                        'exec': False
+                    }
+                ],
+                'branches': [],
+                'name': 'obj-firefox/dist/include/mozilla/dom/DOMRectListBinding.h',
+                'coverage': [
+                    None,
+                    2,
+                    None,
+                    1,
+                    0
+                ],
+                'source_digest': 'another_generated_number_with_literals'
+            }
+        ]
+    }
+    report = {
+        'git': {
+            'branch': 'master',
+            'head': {
+                'id': 'UNUSED'
+            }
+        },
+        'repo_token': 'UNUSED',
+        'service_job_number': '',
+        'service_name': '',
+        'service_number': '',
+        'source_files': [
+            {
+                'functions': [
+                    {
+                        'name': 'func1',
+                        'start': 36,
+                        'exec': True
+                    },
+                    {
+                        'name': 'func2',
+                        'start': 64,
+                        'exec': True
+                    }
+                ],
+                'branches': [],
+                'name': 'obj-firefox/dist/include/mozilla/dom/DOMRectListBinding.h',
+                'coverage': [
+                    None,
+                    2,
+                    None,
+                    5,
+                    6
+                ],
+                'source_digest': 'another_generated_number_with_literals2'
+            }
+        ]
+    }
+    assert diff.compare_reports(baseline_report, report, True) == {
+        'git': {
+            'branch': 'master',
+            'head': {
+                'id': 'UNUSED'
+            }
+        },
+        'repo_token': 'UNUSED',
+        'service_job_number': '',
+        'service_name': '',
+        'service_number': '',
+        'source_files': [
+            {
+                'functions': [
+                    {
+                        'name': 'func2',
+                        'start': 64,
+                        'exec': True
+                    }
+                ],
+                'branches': [],
+                'name': 'obj-firefox/dist/include/mozilla/dom/DOMRectListBinding.h',
+                'coverage': [
+                    None,
+                    0,
+                    None,
+                    0,
+                    1
+                ],
+                'source_digest': 'another_generated_number_with_literals'
+            }
+        ]
     }
