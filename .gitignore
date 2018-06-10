@@ -102,3 +102,8 @@ ENV/
 
 data/
 tools/
+ccov-artifacts/
+.pytest_cache/
+output.json
+tests_report.json
+*.zip
