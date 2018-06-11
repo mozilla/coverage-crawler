@@ -49,7 +49,8 @@ def compare_reports(baseline_report, report, ignore_hits):
         for j in coverage:
             comp_result = compare_source_files_objects(i, j, ignore_hits)
             if comp_result is not None:
-                source_files.append(comp_result)
+                if len(comp_result['functions']) != 0 or not all(cov == 0 or cov is None for cov in comp_result['coverage']):
+                    source_files.append(comp_result)
     diff_report['source_files'] = source_files
     for name in ['git', 'repo_token', 'service_job_number', 'service_name', 'service_number']:
         diff_report[name] = baseline_report[name]
