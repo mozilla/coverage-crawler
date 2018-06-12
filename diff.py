@@ -32,7 +32,7 @@ def compare_source_files_objects(obj1, obj2, ignore_hits):
                         if func1['exec'] is False and func2['exec'] is True:
                             diff_funcs.append(func2)
 
-    if len(diff_funcs) == 0 and len(diff_cov) == 0:
+    if len(diff_funcs) == 0 and len(diff_cov) == 0 or all(cov == 0 or cov is None for cov in diff_cov) and len(diff_funcs) == 0:
         return None
     else:
         obj1['coverage'] = diff_cov
@@ -49,8 +49,7 @@ def compare_reports(baseline_report, report, ignore_hits):
         for j in coverage:
             comp_result = compare_source_files_objects(i, j, ignore_hits)
             if comp_result is not None:
-                if len(comp_result['functions']) != 0 or not all(cov == 0 or cov is None for cov in comp_result['coverage']):
-                    source_files.append(comp_result)
+                source_files.append(comp_result)
     diff_report['source_files'] = source_files
     for name in ['git', 'repo_token', 'service_job_number', 'service_name', 'service_number']:
         diff_report[name] = baseline_report[name]
