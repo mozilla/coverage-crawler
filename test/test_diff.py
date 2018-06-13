@@ -424,6 +424,88 @@ def test_compare_reports():
     }
 
 
+def test_compare_reports_coverage_no_problems():
+    baseline_report = {
+        'git': {
+            'branch': 'master',
+            'head': {
+                'id': 'UNUSED'
+            }
+        },
+        'repo_token': 'UNUSED',
+        'service_job_number': '',
+        'service_name': '',
+        'service_number': '',
+        'source_files': [
+            {
+                'functions': [
+                    {
+                        'name': 'func1',
+                        'start': 36,
+                        'exec': True
+                    }
+                ],
+                'branches': [],
+                'name': 'obj-firefox/dist/include/mozilla/dom/DOMRectListBinding.h',
+                'coverage': [
+                    None,
+                    2,
+                    None,
+                    1,
+                    5
+                ],
+                'source_digest': 'another_generated_number_with_literals'
+            }
+        ]
+    }
+    report = {
+        'git': {
+            'branch': 'master',
+            'head': {
+                'id': 'UNUSED'
+            }
+        },
+        'repo_token': 'UNUSED',
+        'service_job_number': '',
+        'service_name': '',
+        'service_number': '',
+        'source_files': [
+            {
+                'functions': [
+                    {
+                        'name': 'func1',
+                        'start': 36,
+                        'exec': True
+                    }
+                ],
+                'branches': [],
+                'name': 'obj-firefox/dist/include/mozilla/dom/DOMRectListBinding.h',
+                'coverage': [
+                    None,
+                    0,
+                    None,
+                    0,
+                    5
+                ],
+                'source_digest': 'another_generated_number_with_literals2'
+            }
+        ]
+    }
+    assert diff.compare_reports(baseline_report, report, False) == {
+        'git': {
+            'branch': 'master',
+            'head': {
+                'id': 'UNUSED'
+            }
+        },
+        'repo_token': 'UNUSED',
+        'service_job_number': '',
+        'service_name': '',
+        'service_number': '',
+        'source_files': []
+    }
+
+
 def test_compare_reports_2_files():
     baseline_report = {
         'git': {
