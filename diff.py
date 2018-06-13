@@ -32,7 +32,7 @@ def compare_source_files_objects(obj1, obj2, ignore_hits):
                         if func1['exec'] is False and func2['exec'] is True:
                             diff_funcs.append(func2)
 
-    if len(diff_funcs) == 0 and len(diff_cov) == 0 or all(cov == 0 or cov is None for cov in diff_cov) and len(diff_funcs) == 0:
+    if len(diff_funcs) == 0 and all(cov == 0 or cov is None for cov in diff_cov):
         return None
     else:
         obj1['coverage'] = diff_cov
