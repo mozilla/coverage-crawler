@@ -95,6 +95,9 @@ def do_something(driver):
         elem = child
         break
 
+    driver.execute_script('return arguments[0].scrollIntoView();', elem)
+    time.sleep(1)
+
     if elem is None:
         return None
 
@@ -116,8 +119,18 @@ def do_something(driver):
             elem.send_keys('3')
         elif input_type == 'submit':
             elem.click()
+        elif input_type == 'color':
+            driver.execute_script("arguments[0].value = '#ff0000'", elem)
+        elif input_type == 'search':
+            elem.clear()
+            elem.send_keys('quick search')
         else:
             raise Exception('Unsupported input type: %s' % input_type)
+    elif elem.tag_name == 'select':
+        for option in elem.find_elements_by_tag_name('option'):
+            if option.text != '':
+                option.click()
+                break
 
     close_all_windows_except_first(driver)
 
@@ -149,7 +162,7 @@ def run(website, driver):
 
     saved_sequence = []
     try:
-        for i in range(0, 7):
+        for i in range(0, 20):
             elem_attributes = do_something(driver)
             if elem_attributes is None:
                 print('Can\'t find any element to interact with on {}'.format(website))
