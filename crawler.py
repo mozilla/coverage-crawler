@@ -263,4 +263,5 @@ with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as
     with open('{}/diff.json'.format(data_folder), 'w') as outfile:
         json.dump(diff_report, outfile)
 
-    os.remove('code-coverage-gcda.zip')
+    for filename in ['code-coverage-gcda.zip', jsvm_output_file]:
+        os.remove(filename)
