@@ -229,6 +229,15 @@ with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as
     data_folder = str(uuid.uuid4())
     run_all(driver, data_folder)
 
+    sys.path.insert(0, 'tools/mozbuild/codecoverage')
+
+    from lcov_rewriter import LcovFileRewriter
+
+    jsvm_output_file = 'jsvm_lcov_output.info'
+    jsvm_files = [os.path.join(jsvm_dir, e) for e in os.listdir(jsvm_dir)]
+    rewriter = LcovFileRewriter(os.path.join('tools', 'chrome-map.json'))
+    rewriter.rewrite_files(jsvm_files, jsvm_output_file, '')
+
     # Zip gcda file from gcov directory
     shutil.make_archive('code-coverage-gcda', 'zip', gcov_dir)
     grcov_command = [
@@ -236,6 +245,7 @@ with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as
         '-t', 'coveralls+',
         '-p', prefix,
         os.path.join('tools', 'target.code-coverage-gcno.zip'), 'code-coverage-gcda.zip',
+        jsvm_output_file,
         '--filter', 'covered',
         '--token', 'UNUSED',
         '--commit-sha', 'UNUSED'
@@ -253,4 +263,5 @@ with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as
     with open('{}/diff.json'.format(data_folder), 'w') as outfile:
         json.dump(diff_report, outfile)
 
-    os.remove('code-coverage-gcda.zip')
+    for filename in ['code-coverage-gcda.zip', jsvm_output_file]:
+        os.remove(filename)

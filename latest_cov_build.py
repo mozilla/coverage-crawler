@@ -36,7 +36,7 @@ taskId = index.findTask('gecko.v2.mozilla-central.' +
                         'latest.firefox.linux64-ccov-debug')['taskId']
 
 # Download artifacts
-for name in ['target.tar.bz2', 'target.code-coverage-gcno.zip', 'chrome-map.json']:
+for name in ['target.tar.bz2', 'target.code-coverage-gcno.zip', 'chrome-map.json', 'target.common.tests.zip']:
     url = queue.buildUrl('getLatestArtifact', taskId, 'public/build/{}'.format(name))
     urlretrieve(url, os.path.join('tools', name))
 
@@ -78,7 +78,7 @@ grcov_archive = os.path.join('tools', 'grcov.tar.bz2')
 urlretrieve(grcov_url, grcov_archive)
 
 # Extract and delete archives for artifacts
-for filename in ['tools/target.tar.bz2', geckodriver_archive, grcov_archive]:
+for filename in ['tools/target.tar.bz2', geckodriver_archive, grcov_archive, 'tools/target.common.tests.zip']:
     if filename.endswith('zip'):
         with zipfile.ZipFile(filename, 'r') as zip_ref:
             zip_ref.extractall(path='tools')
