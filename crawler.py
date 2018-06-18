@@ -11,13 +11,13 @@ import time
 import traceback
 import uuid
 
-import codecoverage
 from selenium import webdriver
 from selenium.common.exceptions import NoAlertPresentException
 from selenium.common.exceptions import NoSuchWindowException
 from selenium.common.exceptions import TimeoutException
 
 import diff
+import generatehtml
 
 
 def set_timeouts(driver):
@@ -267,61 +267,6 @@ with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as
     for filename in ['code-coverage-gcda.zip', jsvm_output_file]:
         os.remove(filename)
 
-    with open('{}/diff.json'.format(data_folder), 'r') as report:
-        parsed_json = json.load(report)
+    subprocess.call(['hg', 'clone', 'https://hg.mozilla.org/mozilla-central/', 'firefox'])
 
-    file_obj = open('{}/report.info'.format(data_folder), 'w')
-
-    source_files = parsed_json['source_files']
-
-    file_obj.write('TN\n')
-    for source_file in source_files:
-        file_obj.write('SF:{}\n'.format(source_file['name']))
-        executed = 0
-
-        # Functions
-        if len(source_file['functions']) != 0:
-            for function in source_file['functions']:
-                file_obj.write('FN:{},{}\n'.format(function['start'], function['name']))
-            for function in source_file['functions']:
-                if function['exec'] is True:
-                    file_obj.write('FNDA:{},{}\n'.format(1, function['name']))
-                    executed += 1
-                else:
-                    file_obj.write('FNDA:{},{}\n'.format(0, function['name']))
-        file_obj.write('FNF:{}\n'.format(len(source_file['functions'])))
-        file_obj.write('FNH:{}\n'.format(executed))
-
-        # Branches
-        branch_hits = 0
-        if len(source_file['branches']) != 0:
-            for branch in source_file['branches']:
-                if branch['taken'] is True:
-                    file_obj.write('BRDA:{},0,{},{}\n'.format(branch['line'], branch['number'], 1))
-                    branch_hits += 1
-                else:
-                    file_obj.write('BRDA:{},0,{},{}\n'.format(branch['line'], branch['number'], '-'))
-        file_obj.write('BRF:{}\n'.format(len(source_file['branches'])))
-        file_obj.write('BRH:{}\n'.format(branch_hits))
-
-        # Lines
-        line_number = 0
-        cov_line_count = 0
-        if len(source_file['coverage']) != 0:
-            for line in source_file['coverage']:
-                line_number += 1
-                if line is not None:
-                    file_obj.write('DA:{},{}\n'.format(line_number, line))
-                    if line > 0:
-                        cov_line_count += 1
-        file_obj.write('LF:{}\n'.format(len(source_file['coverage'])))
-        file_obj.write('LH:{}\n'.format(cov_line_count))
-        file_obj.write('end_of_record\n')
-    file_obj.close()
-
-    codecoverage.download_genhtml()
-
-    ret = subprocess.call(['lcov-bin/usr/local/bin/genhtml', '-o', os.path.join(data_folder, 'report'), '--show-details', '--highlight', '--ignore-errors', 'source', '--legend', os.path.join(data_folder, 'report.info'), '--prefix', 'tools/firefox'])
-
-    if ret != 0:
-        raise Exception('Error while running genhtml.')
+    generatehtml.generate_html(data_folder)
