@@ -2,6 +2,7 @@
 
 import os
 import platform
+import subprocess
 import sys
 import tarfile
 import zipfile
@@ -94,3 +95,5 @@ for filename in ['tools/target.tar.bz2', geckodriver_archive, grcov_archive, 'to
 # Download Firefox coverage report
 codecoverage.download_coverage_artifacts(taskId, None)
 codecoverage.generate_report('tools/grcov', 'coveralls+', 'tests_report.json')
+
+subprocess.call(['hg', 'clone', 'https://hg.mozilla.org/mozilla-central/', 'firefox'])

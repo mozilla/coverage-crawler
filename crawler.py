@@ -267,6 +267,4 @@ with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as
     for filename in ['code-coverage-gcda.zip', jsvm_output_file]:
         os.remove(filename)
 
-    subprocess.call(['hg', 'clone', 'https://hg.mozilla.org/mozilla-central/', 'firefox'])
-
     generatehtml.generate_html(data_folder)
