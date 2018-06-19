@@ -6,11 +6,11 @@ import os
 import codecoverage
 
 
-def generate_html(json_file_folder):
-    with open('{}/diff.json'.format(json_file_folder), 'r') as report:
+def generate_html(data_folder):
+    with open('{}/diff.json'.format(data_folder), 'r') as report:
         parsed_json = json.load(report)
 
-    file_obj = open('{}/report.info'.format(json_file_folder), 'w')
+    file_obj = open('{}/output.info'.format(data_folder), 'w')
 
     source_files = parsed_json['source_files']
     file_obj.write('TN\n')
@@ -58,4 +58,4 @@ def generate_html(json_file_folder):
     file_obj.close()
 
     codecoverage.download_genhtml()
-    codecoverage.generate_html_report('firefox', os.path.join(os.getcwd(), '{}/output.info'.format(json_file_folder)), os.path.join(os.getcwd(), '{}/report'.format(json_file_folder)))
+    codecoverage.generate_html_report('mozilla-central', os.path.join(os.getcwd(), '{}/output.info'.format(data_folder)), os.path.join(os.getcwd(), '{}/report'.format(data_folder)))
