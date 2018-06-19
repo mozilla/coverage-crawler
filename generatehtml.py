@@ -59,8 +59,4 @@ def generate_html(json_file_folder):
     file_obj.close()
 
     codecoverage.download_genhtml()
-
-    ret = subprocess.call(['lcov-bin/usr/local/bin/genhtml', '-o', os.path.join(json_file_folder, 'report'), '--show-details', '--highlight', '--ignore-errors', 'source', '--legend', os.path.join(json_file_folder, 'report.info'), '--prefix', 'firefox'])
-
-    if ret != 0:
-        raise Exception('Error while running genhtml.')
+    codecoverage.generate_html_report('firefox', os.path.join(os.getcwd(), '{}/output.info'.format(json_file_folder)), os.path.join(os.getcwd(), '{}/report'.format(json_file_folder)))
