@@ -2,6 +2,7 @@
 
 import os
 import platform
+import subprocess
 import sys
 import tarfile
 import zipfile
@@ -34,6 +35,11 @@ queue = taskcluster.Queue()
 
 taskId = index.findTask('gecko.v2.mozilla-central.' +
                         'latest.firefox.linux64-ccov-debug')['taskId']
+
+# Get revision of the build
+r = requests.get('https://queue.taskcluster.net/v1/task/{}'.format(taskId))
+task_data = r.json()
+revision = task_data['payload']['env']['GECKO_HEAD_REV']
 
 # Download artifacts
 for name in ['target.tar.bz2', 'target.code-coverage-gcno.zip', 'chrome-map.json', 'target.common.tests.zip']:
@@ -94,3 +100,11 @@ for filename in ['tools/target.tar.bz2', geckodriver_archive, grcov_archive, 'to
 # Download Firefox coverage report
 codecoverage.download_coverage_artifacts(taskId, None)
 codecoverage.generate_report('tools/grcov', 'coveralls+', 'tests_report.json')
+
+# Clone if the repository doesn't exist yet. Otherwise, update.
+if os.path.isdir('mozilla-central'):
+    os.chdir('mozilla-central')
+    subprocess.call(['hg', 'pull', '--rev', revision, 'https://hg.mozilla.org/mozilla-central/'])
+    subprocess.call(['hg', 'update', '--rev', revision])
+else:
+    subprocess.call(['hg', 'clone', 'https://hg.mozilla.org/mozilla-central/', '--rev', revision])

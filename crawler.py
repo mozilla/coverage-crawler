@@ -17,6 +17,7 @@ from selenium.common.exceptions import NoSuchWindowException
 from selenium.common.exceptions import TimeoutException
 
 import diff
+import generatehtml
 
 
 def set_timeouts(driver):
@@ -265,3 +266,5 @@ with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as
 
     for filename in ['code-coverage-gcda.zip', jsvm_output_file]:
         os.remove(filename)
+
+    generatehtml.generate_html(data_folder)
