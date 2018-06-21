@@ -104,6 +104,11 @@ data/
 tools/
 ccov-artifacts/
 .pytest_cache/
+lcov/
+lcov-bin/
+mozilla-central/
+report/
 output.json
 tests_report.json
+output.info
 *.zip
