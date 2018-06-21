@@ -206,15 +206,6 @@ def run_all(driver, data_folder):
     driver.quit()
 
 
-def create_diff_report(baseline_report, report, ignore_hits, ignore_third_party=True):
-    if ignore_third_party:
-        report = filterpaths.ignore_third_party_filter(report)
-
-    diff_report = diff.compare_reports(baseline_report, report, ignore_hits)
-
-    return diff_report
-
-
 # Environmental vars set to overwrite default location of .gcda files
 if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
     prefix = '/builds/worker/workspace/build/src/'
@@ -269,8 +260,10 @@ with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as
         baseline_report = json.load(baseline_rep)
         report = json.load(rep)
 
+    filterpaths.ignore_third_party_filter(report)
+
     # Create diff report
-    diff_report = create_diff_report(baseline_report, report, True)
+    diff_report = diff.compare_reports(baseline_report, report, True)
     with open('{}/diff.json'.format(data_folder), 'w') as outfile:
         json.dump(diff_report, outfile)
 
