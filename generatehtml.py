@@ -47,7 +47,7 @@ def generate_html(data_folder):
         line_number = 0
         cov_line_count = 0
         if len(source_file['coverage']) != 0:
-            for line_number, line in enumerate(source_file['coverage']):
+            for line_number, line in enumerate(source_file['coverage'], 1):
                 if line is not None:
                     file_obj.write('DA:{},{}\n'.format(line_number, line))
                     if line > 0:
