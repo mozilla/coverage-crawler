@@ -6,7 +6,7 @@ import os
 import codecoverage
 
 
-def generate_html(data_folder):
+def generate_html(data_folder, ignore_third_party=False):
     with open('{}/diff.json'.format(data_folder), 'r') as report:
         parsed_json = json.load(report)
 
@@ -15,6 +15,18 @@ def generate_html(data_folder):
     source_files = parsed_json['source_files']
     file_obj.write('TN\n')
     for source_file in source_files:
+        if ignore_third_party is True:
+            ignore = False
+            with open('mozilla-central/tools/rewriting/ThirdPartyPaths.txt') as f:
+                for path in list(f):
+                    if source_file['name'].startswith(path.strip('\n')):
+                        ignore = True
+                        break
+
+            # If source file is third party, skip it
+            if ignore is True:
+                continue
+
         file_obj.write('SF:{}\n'.format(source_file['name']))
         executed = 0
 
