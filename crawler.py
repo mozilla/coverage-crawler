@@ -265,7 +265,6 @@ with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as
     with open('output.json', 'w+') as outfile:
         subprocess.check_call(grcov_command, stdout=outfile)
 
-    data_folder = '1a347af9-8cac-4dbc-a349-66e982c53956'
     with open('tests_report.json') as baseline_rep, open('output.json') as rep:
         baseline_report = json.load(baseline_rep)
         report = json.load(rep)

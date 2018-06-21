@@ -14,7 +14,6 @@ def generate_html(data_folder):
 
     source_files = parsed_json['source_files']
     file_obj.write('TN\n')
-
     for source_file in source_files:
         file_obj.write('SF:{}\n'.format(source_file['name']))
         executed = 0
