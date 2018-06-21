@@ -17,6 +17,7 @@ from selenium.common.exceptions import NoSuchWindowException
 from selenium.common.exceptions import TimeoutException
 
 import diff
+import filterpaths
 import generatehtml
 
 
@@ -258,6 +259,8 @@ with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as
     with open('tests_report.json') as baseline_rep, open('output.json') as rep:
         baseline_report = json.load(baseline_rep)
         report = json.load(rep)
+
+    filterpaths.ignore_third_party_filter(report)
 
     # Create diff report
     diff_report = diff.compare_reports(baseline_report, report, True)
