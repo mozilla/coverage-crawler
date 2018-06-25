@@ -12,9 +12,13 @@ import traceback
 import uuid
 
 from selenium import webdriver
+from selenium.common.exceptions import ElementNotInteractableException
 from selenium.common.exceptions import NoAlertPresentException
 from selenium.common.exceptions import NoSuchWindowException
+from selenium.common.exceptions import StaleElementReferenceException
 from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import WebDriverException
+from selenium.webdriver.common.keys import Keys
 
 import diff
 import filterpaths
@@ -78,6 +82,8 @@ def do_something(driver):
     assert len(body) == 1
     body = body[0]
 
+    body.send_keys(Keys.CONTROL, 0)
+
     buttons = body.find_elements_by_tag_name('button')
     links = body.find_elements_by_tag_name('a')
     inputs = body.find_elements_by_tag_name('input')
@@ -97,11 +103,11 @@ def do_something(driver):
         elem = child
         break
 
-    driver.execute_script('return arguments[0].scrollIntoView();', elem)
-    time.sleep(1)
-
     if elem is None:
         return None
+
+    driver.execute_script('return arguments[0].scrollIntoView();', elem)
+    time.sleep(1)
 
     if elem.tag_name in ['button', 'a']:
         elem.click()
@@ -163,8 +169,8 @@ def run(website, driver):
         print('Continuing...')
 
     saved_sequence = []
-    try:
-        for i in range(0, 20):
+    for i in range(0, 20):
+        try:
             elem_attributes = do_something(driver)
             if elem_attributes is None:
                 print('Can\'t find any element to interact with on {}'.format(website))
@@ -172,10 +178,10 @@ def run(website, driver):
             saved_sequence.append(elem_attributes)
 
             print('  - Using {}'.format(elem_attributes))
-    except TimeoutException as e:
-        # Ignore timeouts, as they are too frequent.
-        traceback.print_exc()
-        print('Continuing...')
+        except (TimeoutException, ElementNotInteractableException, StaleElementReferenceException, WebDriverException):
+            # Ignore frequent exceptions.
+            traceback.print_exc()
+            print('Continuing...')
 
     return saved_sequence
 
