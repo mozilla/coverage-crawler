@@ -87,7 +87,8 @@ def do_something(driver):
     buttons = body.find_elements_by_tag_name('button')
     links = body.find_elements_by_tag_name('a')
     inputs = body.find_elements_by_tag_name('input')
-    children = buttons + links + inputs
+    selects = body.find_elements_by_tag_name('select')
+    children = buttons + links + inputs + selects
 
     random.shuffle(children)
 
@@ -132,6 +133,8 @@ def do_something(driver):
         elif input_type == 'search':
             elem.clear()
             elem.send_keys('quick search')
+        elif input_type == 'radio':
+            elem.click()
         else:
             raise Exception('Unsupported input type: %s' % input_type)
     elif elem.tag_name == 'select':
