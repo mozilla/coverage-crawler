@@ -189,94 +189,102 @@ def run(website, driver):
     return saved_sequence
 
 
-def run_all(driver, data_folder):
-    set_timeouts(driver)
+def run_all():
+    # Environmental vars set to overwrite default location of .gcda files
+    if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
+        prefix = '/builds/worker/workspace/build/src/'
+        strip_count = prefix.count('/')
+    elif sys.platform.startswith('cygwin') or sys.platform.startswith('win32'):
+        prefix = 'z:/build/build/src/'
+        strip_count = prefix.count('/') + 1
 
-    if not os.path.exists(data_folder):
-        os.makedirs(data_folder)
+    # Remove a prefix from the path where .gcda files are stored
+    os.environ['GCOV_PREFIX_STRIP'] = str(strip_count)
+    os.environ['PATH'] += os.pathsep + os.path.abspath('tools')
+    os.environ['MOZ_HEADLESS'] = '1'
 
-    with open('websites.txt') as f:
-        for i, website in enumerate(f):
-            if os.path.exists('{}/{}.txt'.format(data_folder, i)):
-                continue
+    # Create temporary directories with context manager
+    with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as jsvm_dir:
+        os.environ['GCOV_PREFIX'] = gcov_dir
+        os.environ['JS_CODE_COVERAGE_OUTPUT_DIR'] = jsvm_dir
 
-            try:
-                sequence = run(website, driver)
+        with open('websites.txt') as f:
+            for i, website in enumerate(f):
+                driver = webdriver.Firefox(firefox_binary='tools/firefox/firefox-bin')
+                set_timeouts(driver)
 
-                with open('{}/{}.txt'.format(data_folder, i), 'w') as f:
-                    f.write('Website name: ' + website + '\n')
-                    for element in sequence:
-                        f.write(json.dumps(element) + '\n')
+                # All steps are stored in new folder
+                data_folder = str(uuid.uuid4())
 
-            except:  # noqa: E722
-                traceback.print_exc()
-                close_all_windows_except_first(driver)
+                if not os.path.exists(data_folder):
+                    os.makedirs(data_folder)
 
-    driver.quit()
+                if os.path.exists('{}/{}.txt'.format(data_folder, i)):
+                    continue
+
+                try:
+                    sequence = run(website, driver)
+                    with open('{}/{}.txt'.format(data_folder, i), 'w') as f:
+                        f.write('Website name: ' + website + '\n')
+                        for element in sequence:
+                            f.write(json.dumps(element) + '\n')
+
+                    sys.path.insert(0, 'tools/mozbuild/codecoverage')
+
+                    from lcov_rewriter import LcovFileRewriter
+
+                    jsvm_output_file = 'jsvm_lcov_output.info'
+                    jsvm_files = [os.path.join(jsvm_dir, e) for e in os.listdir(jsvm_dir)]
+                    rewriter = LcovFileRewriter(os.path.join('tools', 'chrome-map.json'))
+                    rewriter.rewrite_files(jsvm_files, jsvm_output_file, '')
+
+                    # Zip gcda file from gcov directory
+                    shutil.make_archive('code-coverage-gcda', 'zip', gcov_dir)
+                    grcov_command = [
+                        os.path.join('tools', 'grcov'),
+                        '-t', 'coveralls+',
+                        '-p', prefix,
+                        os.path.join('tools', 'target.code-coverage-gcno.zip'), 'code-coverage-gcda.zip',
+                        jsvm_output_file,
+                        '--filter', 'covered',
+                        '--token', 'UNUSED',
+                        '--commit-sha', 'UNUSED'
+                    ]
+
+                    with open('output.json', 'w+') as outfile:
+                        subprocess.check_call(grcov_command, stdout=outfile)
+
+                    with open('tests_report.json') as baseline_rep, open('output.json') as rep:
+                        baseline_report = json.load(baseline_rep)
+                        report = json.load(rep)
+
+                    filterpaths.ignore_third_party_filter(report)
+
+                    # Create diff report
+                    diff_report = diff.compare_reports(baseline_report, report, True)
+
+                    with open('{}/diff.json'.format(data_folder), 'w') as outfile:
+                        json.dump(diff_report, outfile)
+
+                    for filename in ['code-coverage-gcda.zip', jsvm_output_file]:
+                        os.remove(filename)
+
+                    generatehtml.generate_html(data_folder)
+
+                    # Clean directories
+                    [shutil.rmtree(os.path.join(gcov_dir, f)) for f in os.listdir(gcov_dir)]
+                    [os.remove(os.path.join(jsvm_dir, f)) for f in os.listdir(jsvm_dir)]
+
+                    driver.quit()
+                except:  # noqa: E722
+                    traceback.print_exc()
+                    close_all_windows_except_first(driver)
+                    driver.quit()
 
 
-# Environmental vars set to overwrite default location of .gcda files
-if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
-    prefix = '/builds/worker/workspace/build/src/'
-    strip_count = prefix.count('/')
-elif sys.platform.startswith('cygwin') or sys.platform.startswith('win32'):
-    prefix = 'z:/build/build/src/'
-    strip_count = prefix.count('/') + 1
+def main():
+    run_all()
 
-# Remove a prefix from the path where .gcda files are stored
-os.environ['GCOV_PREFIX_STRIP'] = str(strip_count)
-os.environ['PATH'] += os.pathsep + os.path.abspath('tools')
-os.environ['MOZ_HEADLESS'] = '1'
 
-# create a temporary directory using the context manager
-with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as jsvm_dir:
-    os.environ['GCOV_PREFIX'] = gcov_dir
-    os.environ['JS_CODE_COVERAGE_OUTPUT_DIR'] = jsvm_dir
-
-    # Webdriver uses Firefox Binaries from downloaded cov build
-    driver = webdriver.Firefox(firefox_binary='tools/firefox/firefox-bin')
-
-    # All steps are stored in new folder
-    data_folder = str(uuid.uuid4())
-    run_all(driver, data_folder)
-
-    sys.path.insert(0, 'tools/mozbuild/codecoverage')
-
-    from lcov_rewriter import LcovFileRewriter
-
-    jsvm_output_file = 'jsvm_lcov_output.info'
-    jsvm_files = [os.path.join(jsvm_dir, e) for e in os.listdir(jsvm_dir)]
-    rewriter = LcovFileRewriter(os.path.join('tools', 'chrome-map.json'))
-    rewriter.rewrite_files(jsvm_files, jsvm_output_file, '')
-
-    # Zip gcda file from gcov directory
-    shutil.make_archive('code-coverage-gcda', 'zip', gcov_dir)
-    grcov_command = [
-        os.path.join('tools', 'grcov'),
-        '-t', 'coveralls+',
-        '-p', prefix,
-        os.path.join('tools', 'target.code-coverage-gcno.zip'), 'code-coverage-gcda.zip',
-        jsvm_output_file,
-        '--filter', 'covered',
-        '--token', 'UNUSED',
-        '--commit-sha', 'UNUSED'
-    ]
-
-    with open('output.json', 'w+') as outfile:
-        subprocess.check_call(grcov_command, stdout=outfile)
-
-    with open('tests_report.json') as baseline_rep, open('output.json') as rep:
-        baseline_report = json.load(baseline_rep)
-        report = json.load(rep)
-
-    filterpaths.ignore_third_party_filter(report)
-
-    # Create diff report
-    diff_report = diff.compare_reports(baseline_report, report, True)
-    with open('{}/diff.json'.format(data_folder), 'w') as outfile:
-        json.dump(diff_report, outfile)
-
-    for filename in ['code-coverage-gcda.zip', jsvm_output_file]:
-        os.remove(filename)
-
-    generatehtml.generate_html(data_folder)
+if __name__ == '__main__':
+    main()
