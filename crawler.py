@@ -233,7 +233,7 @@ def run_all():
 
                 # Add paths to Mozilla-central modules
                 sys.path.insert(0, 'tools/mozbuild/codecoverage')
-                sys.path.insert(0,'tools')
+                sys.path.insert(0, 'tools')
 
                 from lcov_rewriter import LcovFileRewriter
 
