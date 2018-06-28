@@ -90,7 +90,7 @@ def download_artifacts(revision=None):
     urlretrieve(grcov_url, grcov_archive)
 
     # Extract and delete archives for artifacts
-    for filename in ['tools/target.tar.bz2', geckodriver_archive, grcov_archive, 'tools/target.common.tests.zip']:
+    for filename in ['tools/target.code-coverage-gcno.zip', 'tools/target.tar.bz2', geckodriver_archive, grcov_archive, 'tools/target.common.tests.zip']:
         if filename.endswith('zip'):
             with zipfile.ZipFile(filename, 'r') as zip_ref:
                 zip_ref.extractall(path='tools')
