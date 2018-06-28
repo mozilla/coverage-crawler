@@ -231,8 +231,9 @@ def run_all():
                     traceback.print_exc()
                     close_all_windows_except_first(driver)
 
-                # Add paths to Mozilla-central lcov_rewriter module
+                # Add paths to Mozilla-central modules
                 sys.path.insert(0, 'tools/mozbuild/codecoverage')
+                sys.path.insert(0,'tools')
 
                 from lcov_rewriter import LcovFileRewriter
 
