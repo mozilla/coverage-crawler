@@ -3,7 +3,6 @@
 import json
 import os
 import random
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -242,13 +241,11 @@ def run_all():
                 rewriter = LcovFileRewriter(os.path.join('tools', 'chrome-map.json'))
                 rewriter.rewrite_files(jsvm_files, jsvm_output_file, '')
 
-                # Zip gcda file from gcov directory
-                shutil.make_archive('code-coverage-gcda', 'zip', gcov_dir)
                 grcov_command = [
                     os.path.join('tools', 'grcov'),
                     '-t', 'coveralls+',
                     '-p', prefix,
-                    os.path.join('tools', 'target.code-coverage-gcno.zip'), 'code-coverage-gcda.zip',
+                    'tools', gcov_dir,
                     jsvm_output_file,
                     '--filter', 'covered',
                     '--token', 'UNUSED',
@@ -270,8 +267,7 @@ def run_all():
                 with open('{}/diff.json'.format(data_folder), 'w') as outfile:
                     json.dump(diff_report, outfile)
 
-                for filename in ['code-coverage-gcda.zip', jsvm_output_file]:
-                    os.remove(filename)
+                os.remove(jsvm_output_file)
 
                 generatehtml.generate_html(data_folder)
 
