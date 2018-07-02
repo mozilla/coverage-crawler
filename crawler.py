@@ -91,9 +91,7 @@ def do_something(driver):
         links = body.find_elements_by_tag_name('a')
         inputs = body.find_elements_by_tag_name('input')
         selects = body.find_elements_by_tag_name('select')
-        dialogs = body.find_elements_by_tag_name('dialog')
-        frames = body.find_elements_by_tag_name('frame')
-        children = buttons + links + inputs + selects + dialogs + frames
+        children = buttons + links + inputs + selects
 
         random.shuffle(children)
 
