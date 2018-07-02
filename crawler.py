@@ -12,6 +12,7 @@ import uuid
 
 from selenium import webdriver
 from selenium.common.exceptions import ElementNotInteractableException
+from selenium.common.exceptions import InvalidSelectorException
 from selenium.common.exceptions import NoAlertPresentException
 from selenium.common.exceptions import NoSuchWindowException
 from selenium.common.exceptions import StaleElementReferenceException
@@ -76,75 +77,89 @@ def close_all_windows_except_first(driver):
 
 
 def do_something(driver):
-    elem = None
-    body = driver.find_elements_by_tag_name('body')
-    assert len(body) == 1
-    body = body[0]
+    not_clickable_elems = set()
 
-    body.send_keys(Keys.CONTROL, 0)
+    while True:
+        elem = None
+        body = driver.find_elements_by_tag_name('body')
+        assert len(body) == 1
+        body = body[0]
 
-    buttons = body.find_elements_by_tag_name('button')
-    links = body.find_elements_by_tag_name('a')
-    inputs = body.find_elements_by_tag_name('input')
-    selects = body.find_elements_by_tag_name('select')
-    children = buttons + links + inputs + selects
+        body.send_keys(Keys.CONTROL, 0)
 
-    random.shuffle(children)
+        buttons = body.find_elements_by_tag_name('button')
+        links = body.find_elements_by_tag_name('a')
+        inputs = body.find_elements_by_tag_name('input')
+        selects = body.find_elements_by_tag_name('select')
+        children = buttons + links + inputs + selects
 
-    for child in children:
-        # Get all the attributes of the child.
-        child_attributes = get_all_attributes(driver, child)
+        random.shuffle(children)
 
-        # If the element is not displayed or is disabled, the user can't interact with it. Skip
-        # non-displayed/disabled elements, since we're trying to mimic a real user.
-        if not child.is_displayed() or not child.is_enabled():
-            continue
+        try:
+            for child in children:
+                # Get all the attributes of the child.
+                child_attributes = get_all_attributes(driver, child)
 
-        elem = child
-        break
+                # If the element is not displayed or is disabled, the user can't interact with it. Skip
+                # non-displayed/disabled elements, since we're trying to mimic a real user.
+                if not child.is_displayed() or not child.is_enabled() or child in not_clickable_elems:
+                    continue
 
-    if elem is None:
-        return None
-
-    driver.execute_script('return arguments[0].scrollIntoView();', elem)
-    time.sleep(1)
-
-    if elem.tag_name in ['button', 'a']:
-        elem.click()
-    elif elem.tag_name == 'input':
-        input_type = elem.get_attribute('type')
-        if input_type == 'url':
-            elem.send_keys('http://www.mozilla.org/')
-        elif input_type == 'text':
-            elem.send_keys('marco')
-        elif input_type == 'email':
-            elem.send_keys('prova@email.it')
-        elif input_type == 'password':
-            elem.send_keys('aMildlyComplexPasswordIn2017')
-        elif input_type == 'checkbox':
-            elem.click()
-        elif input_type == 'number':
-            elem.send_keys('3')
-        elif input_type == 'submit':
-            elem.click()
-        elif input_type == 'color':
-            driver.execute_script("arguments[0].value = '#ff0000'", elem)
-        elif input_type == 'search':
-            elem.clear()
-            elem.send_keys('quick search')
-        elif input_type == 'radio':
-            elem.click()
-        else:
-            raise Exception('Unsupported input type: %s' % input_type)
-    elif elem.tag_name == 'select':
-        for option in elem.find_elements_by_tag_name('option'):
-            if option.text != '':
-                option.click()
+                elem = child
                 break
 
-    close_all_windows_except_first(driver)
+            if elem is None:
+                return None
 
-    return child_attributes
+            driver.execute_script('return arguments[0].scrollIntoView();', elem)
+            time.sleep(1)
+
+            if elem.tag_name in ['button', 'a']:
+                elem.click()
+            elif elem.tag_name == 'input':
+                input_type = elem.get_attribute('type')
+                if input_type == 'url':
+                    elem.send_keys('http://www.mozilla.org/')
+                elif input_type == 'text':
+                    elem.send_keys('marco')
+                elif input_type == 'email':
+                    elem.send_keys('prova@email.it')
+                elif input_type == 'password':
+                    elem.send_keys('aMildlyComplexPasswordIn2017')
+                elif input_type == 'checkbox':
+                    elem.click()
+                elif input_type == 'number':
+                    elem.send_keys('3')
+                elif input_type in ['submit', 'reset', 'button']:
+                    elem.click()
+                elif input_type == 'color':
+                    driver.execute_script("arguments[0].value = '#ff0000'", elem)
+                elif input_type == 'search':
+                    elem.clear()
+                    elem.send_keys('quick search')
+                elif input_type == 'radio':
+                    elem.click()
+                elif input_type == 'tel':
+                    elem.send_keys('1234567890')
+                elif input_type == 'date':
+                    elem.send_keys('20000101')
+                else:
+                    raise Exception('Unsupported input type: %s' % input_type)
+            elif elem.tag_name == 'select':
+                for option in elem.find_elements_by_tag_name('option'):
+                    if option.text != '':
+                        option.click()
+                        break
+
+            close_all_windows_except_first(driver)
+
+            return child_attributes
+
+        except (ElementNotInteractableException, StaleElementReferenceException, InvalidSelectorException, WebDriverException):
+            # Ignore frequent exceptions.
+            traceback.print_exc()
+            not_clickable_elems.add(elem)
+            close_all_windows_except_first(driver)
 
 
 def get_all_attributes(driver, child):
@@ -180,8 +195,8 @@ def run(website, driver):
             saved_sequence.append(elem_attributes)
 
             print('  - Using {}'.format(elem_attributes))
-        except (TimeoutException, ElementNotInteractableException, StaleElementReferenceException, WebDriverException):
-            # Ignore frequent exceptions.
+        except TimeoutException:
+            # Ignore frequent Timeout exceptions.
             traceback.print_exc()
             print('Continuing...')
 
