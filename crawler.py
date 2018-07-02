@@ -152,17 +152,6 @@ def do_something(driver):
                     if option.text != '':
                         option.click()
                         break
-            elif elem.tag_name in ['dialog', 'frame']:
-                if len(elem.find_elements_by_tag_name('button')) != 0:
-                    for button in elem.find_elements_by_tag_name('button'):
-                        button.click()
-                        break
-                elif len(elem.find_elements_by_tag_name('a')) != 0:
-                    for link in elem.find_elements_by_tag_name('a'):
-                        if link.text != '':
-                            link.click()
-                            break
-            not_clickable_elems.clear()
 
             close_all_windows_except_first(driver)
 
@@ -173,8 +162,6 @@ def do_something(driver):
             traceback.print_exc()
             not_clickable_elems.add(elem)
             close_all_windows_except_first(driver)
-
-    return None
 
 
 def get_all_attributes(driver, child):
@@ -204,7 +191,6 @@ def run(website, driver):
     for i in range(0, 20):
         try:
             elem_attributes = do_something(driver)
-
             if elem_attributes is None:
                 print('Can\'t find any element to interact with on {}'.format(website))
                 break
