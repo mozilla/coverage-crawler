@@ -147,7 +147,6 @@ def do_something(driver):
                     elem.send_keys('20000101')
                 else:
                     raise Exception('Unsupported input type: %s' % input_type)
-                print(input_type)
             elif elem.tag_name == 'select':
                 for option in elem.find_elements_by_tag_name('option'):
                     if option.text != '':
@@ -171,7 +170,6 @@ def do_something(driver):
 
         except (ElementNotInteractableException, StaleElementReferenceException, InvalidSelectorException, WebDriverException):
             # Ignore frequent exceptions.
-            print(len(not_clickable_elems))
             traceback.print_exc()
             not_clickable_elems.add(elem)
             close_all_windows_except_first(driver)
