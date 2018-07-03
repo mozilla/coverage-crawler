@@ -24,6 +24,8 @@ import diff
 import filterpaths
 import generatehtml
 
+already_clicked_elems = set()
+
 
 def set_timeouts(driver):
     driver.set_script_timeout(30)
@@ -96,6 +98,10 @@ def do_something(driver):
         random.shuffle(children)
 
         try:
+            # If there are some remaining elements that are not ignored, prefer them
+            if set(children) - already_clicked_elems > not_clickable_elems:
+                children = list(set(children) - already_clicked_elems)
+
             for child in children:
                 # Get all the attributes of the child.
                 child_attributes = get_all_attributes(driver, child)
@@ -150,6 +156,8 @@ def do_something(driver):
                     if option.text != '':
                         option.click()
                         break
+
+            already_clicked_elems.add(elem)
 
             close_all_windows_except_first(driver)
 
@@ -218,6 +226,7 @@ def run_all():
     os.environ['MOZ_HEADLESS'] = '1'
     with open('websites.txt') as f:
         for i, website in enumerate(f):
+            already_clicked_elems.clear()
             # Create temporary directories with context manager
             with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as jsvm_dir:
                 os.environ['GCOV_PREFIX'] = gcov_dir
