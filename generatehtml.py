@@ -58,4 +58,4 @@ def generate_html(data_folder):
     file_obj.close()
 
     codecoverage.download_genhtml()
-    codecoverage.generate_html_report('mozilla-central', os.path.join(os.getcwd(), '{}/output.info'.format(data_folder)), os.path.join(os.getcwd(), '{}/report'.format(data_folder)))
+    codecoverage.generate_html_report('mozilla-central', os.path.join(os.getcwd(), '{}/output.info'.format(data_folder)), os.path.join(os.getcwd(), '{}/report'.format(data_folder)), style_file=os.path.join(os.getcwd(), 'style.css'))
