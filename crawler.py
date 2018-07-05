@@ -98,7 +98,7 @@ def do_something(driver):
         random.shuffle(children)
 
         try:
-            # If there are some remaining elements that are not ignored, prefer them
+            # If we have clickable elements on which we haven't clicked yet, use them; otherwise, use all elements
             if set(children) - already_clicked_elems > not_clickable_elems:
                 children = list(set(children) - already_clicked_elems)
 
