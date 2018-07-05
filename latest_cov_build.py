@@ -106,10 +106,8 @@ def download_artifacts(revision=None):
     codecoverage.download_coverage_artifacts(taskId, None)
     codecoverage.generate_report('tools/grcov', 'coveralls+', 'tests_report.json', 'ccov-artifacts')
 
-    # Generate HTML Firefox coverage report
+    # Download genhtml
     codecoverage.download_genhtml()
-    codecoverage.generate_report('tools/grcov', 'lcov', 'output.info', 'ccov-artifacts')
-    codecoverage.generate_html_report('mozilla-central')
 
     # Clone if the repository doesn't exist yet. Otherwise, update.
     if os.path.isdir('mozilla-central'):
