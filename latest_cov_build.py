@@ -28,7 +28,6 @@ def get_github_release_url(repo_slug):
 
 
 def download_artifacts(revision=None):
-
     # Create 'tools/' directory if doesn't exist
     if not os.path.exists('tools'):
         os.makedirs('tools')
@@ -105,7 +104,12 @@ def download_artifacts(revision=None):
 
     # Download Firefox coverage report
     codecoverage.download_coverage_artifacts(taskId, None)
-    codecoverage.generate_report('tools/grcov', 'coveralls+', 'tests_report.json')
+    codecoverage.generate_report('tools/grcov', 'coveralls+', 'tests_report.json', 'ccov-artifacts')
+
+    # Generate HTML Firefox coverage report
+    codecoverage.download_genhtml()
+    codecoverage.generate_report('tools/grcov', 'lcov', 'output.info', 'ccov-artifacts')
+    codecoverage.generate_html_report('mozilla-central')
 
     # Clone if the repository doesn't exist yet. Otherwise, update.
     if os.path.isdir('mozilla-central'):
