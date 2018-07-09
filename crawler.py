@@ -3,7 +3,6 @@
 import json
 import os
 import random
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -261,10 +260,11 @@ def run_all():
 
                 from lcov_rewriter import LcovFileRewriter
 
-                os.makedirs('jsvm_output', exist_ok=True)
-                jsvm_output_file = os.path.join('jsvm_output', 'jsvm_lcov_output.info')
                 jsvm_files = [os.path.join(jsvm_dir, e) for e in os.listdir(jsvm_dir)]
                 rewriter = LcovFileRewriter(os.path.join('tools', 'chrome-map.json'))
+                jsvm_output_dir = os.path.join(jsvm_dir, 'jsvm_output')
+                os.makedirs(jsvm_output_dir, exist_ok=True)
+                jsvm_output_file = os.path.join(jsvm_output_dir, 'jsvm_lcov_output.info')
                 rewriter.rewrite_files(jsvm_files, jsvm_output_file, '')
 
                 grcov_command = [
@@ -272,7 +272,7 @@ def run_all():
                     '-t', 'coveralls+',
                     '-p', prefix,
                     'tools', gcov_dir,
-                    'jsvm_output',
+                    jsvm_output_dir,
                     '--filter', 'covered',
                     '--token', 'UNUSED',
                     '--commit-sha', 'UNUSED'
@@ -292,8 +292,6 @@ def run_all():
 
                 with open('{}/diff.json'.format(data_folder), 'w') as outfile:
                     json.dump(diff_report, outfile)
-
-                shutil.rmtree('jsvm_output')
 
                 generatehtml.generate_html(data_folder)
 
