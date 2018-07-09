@@ -9,6 +9,7 @@ import tempfile
 import time
 import traceback
 import uuid
+import zipfile
 
 from selenium import webdriver
 from selenium.common.exceptions import ElementNotInteractableException
@@ -265,12 +266,15 @@ def run_all():
                 rewriter = LcovFileRewriter(os.path.join('tools', 'chrome-map.json'))
                 rewriter.rewrite_files(jsvm_files, jsvm_output_file, '')
 
+                with zipfile.ZipFile('jsvm_lcov.zip', 'w') as myzip:
+                    myzip.write(jsvm_output_file)
+
                 grcov_command = [
                     os.path.join('tools', 'grcov'),
                     '-t', 'coveralls+',
                     '-p', prefix,
                     'tools', gcov_dir,
-                    jsvm_output_file,
+                    os.path.join(os.getcwd(), 'jsvm_lcov.zip'),
                     '--filter', 'covered',
                     '--token', 'UNUSED',
                     '--commit-sha', 'UNUSED'
@@ -278,7 +282,6 @@ def run_all():
 
                 with open('output.json', 'w+') as outfile:
                     subprocess.check_call(grcov_command, stdout=outfile)
-
                 with open('tests_report.json') as baseline_rep, open('output.json') as rep:
                     baseline_report = json.load(baseline_rep)
                     report = json.load(rep)
@@ -291,7 +294,8 @@ def run_all():
                 with open('{}/diff.json'.format(data_folder), 'w') as outfile:
                     json.dump(diff_report, outfile)
 
-                os.remove(jsvm_output_file)
+                for name in [jsvm_output_file, 'jsvm_lcov.zip']:
+                    os.remove(name)
 
                 generatehtml.generate_html(data_folder)
 
