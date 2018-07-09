@@ -261,13 +261,11 @@ def run_all():
 
                 from lcov_rewriter import LcovFileRewriter
 
-                jsvm_output_file = 'jsvm_lcov_output.info'
+                os.makedirs('jsvm_output', exist_ok=True)
+                jsvm_output_file = os.path.join('jsvm_output', 'jsvm_lcov_output.info')
                 jsvm_files = [os.path.join(jsvm_dir, e) for e in os.listdir(jsvm_dir)]
                 rewriter = LcovFileRewriter(os.path.join('tools', 'chrome-map.json'))
                 rewriter.rewrite_files(jsvm_files, jsvm_output_file, '')
-
-                os.makedirs('jsvm_output', exist_ok=True)
-                shutil.move(jsvm_output_file, os.path.join('jsvm_output', jsvm_output_file))
 
                 grcov_command = [
                     os.path.join('tools', 'grcov'),
