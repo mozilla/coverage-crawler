@@ -10,7 +10,7 @@ from setuptools import setup
 
 def read_requirements(file_):
     lines = []
-    with open(file_) as f:
+    with open(os.path.join(os.path.dirname(__file__), file_)) as f:
         for line in f.readlines():
             line = line.strip()
             if line.startswith('-e ') or line.startswith('http://') or line.startswith('https://'):
