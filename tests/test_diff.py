@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-import diff
+from coverage_crawler import diff
 
 
 # diff.compare_objects(obj1, obj2) returns true if equal and false if different coverage
