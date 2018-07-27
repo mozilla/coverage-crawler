@@ -44,4 +44,5 @@ setup(
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
     include_package_data=True,
     zip_safe=False,
+    license='MPL2',
 )
