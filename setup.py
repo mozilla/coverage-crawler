@@ -7,12 +7,12 @@ import os
 from setuptools import find_packages
 from setuptools import setup
 
-here = os.os.path.dirname(__file__)
-
+here = os.path.dirname(__file__)
+filename = os.path.join(here, 'requirements.txt')
 
 def read_requirements(file_):
     lines = []
-    with open(os.path.join(here, file_)) as f:
+    with open(file_) as f:
         for line in f.readlines():
             line = line.strip()
             if line.startswith('-e ') or line.startswith('http://') or line.startswith('https://'):
@@ -31,6 +31,6 @@ setup(
     name='coverage_crawler',
     version='1.0.0',
     description='A crawler to find websites that exercise code in Firefox that is not covered by unit tests',
-    install_requires=read_requirements('requirements.txt'),
+    install_requires=read_requirements(filename),
     packages=find_packages(exclude=['contrib', 'docs', 'tests'])
 )
