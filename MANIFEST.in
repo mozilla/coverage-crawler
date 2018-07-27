@@ -1,4 +1,6 @@
 include requirements.txt
+include style.css
+include websites.txt
 
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
