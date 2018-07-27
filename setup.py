@@ -7,7 +7,7 @@ import os
 from setuptools import find_packages
 from setuptools import setup
 
-here = os.getcwd()
+here = os.os.path.dirname(__file__)
 
 
 def read_requirements(file_):
