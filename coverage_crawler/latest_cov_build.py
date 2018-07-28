@@ -103,7 +103,7 @@ def download_artifacts(revision=None):
         os.remove(filename)
 
     # Download Firefox coverage report
-    codecoverage.download_coverage_artifacts(taskId, None)
+    codecoverage.download_coverage_artifacts(taskId, None, None, 'ccov-artifacts')
     codecoverage.generate_report('tools/grcov', 'coveralls+', 'tests_report.json', 'ccov-artifacts')
 
     # Download genhtml
