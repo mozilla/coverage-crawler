@@ -20,9 +20,9 @@ from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.keys import Keys
 
-import diff
-import filterpaths
-import generatehtml
+from coverage_crawler import diff
+from coverage_crawler import filterpaths
+from coverage_crawler import generatehtml
 
 already_clicked_elems = set()
 
@@ -296,11 +296,3 @@ def run_all():
                 generatehtml.generate_html(data_folder)
 
                 driver.quit()
-
-
-def main():
-    run_all()
-
-
-if __name__ == '__main__':
-    main()
