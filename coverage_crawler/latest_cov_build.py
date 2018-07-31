@@ -8,9 +8,9 @@ import sys
 import tarfile
 import zipfile
 
-import codecoverage
 import requests
 import taskcluster
+from firefox_code_coverage import codecoverage
 
 try:
     from urllib.request import urlretrieve

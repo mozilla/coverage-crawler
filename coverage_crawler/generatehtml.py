@@ -3,7 +3,7 @@
 import json
 import os
 
-import codecoverage
+from firefox_code_coverage import codecoverage
 
 
 def generate_html(data_folder):
