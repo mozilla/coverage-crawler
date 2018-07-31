@@ -17,10 +17,8 @@ def read_requirements(file_):
         for line in f.readlines():
             line = line.strip()
 
-            if line.startswith('-e '):
-                links.append(line[3:] + '-' + line.split('@')[1].split('#')[0])
-
-            if line.startswith('-e ') or line.startswith('http://') or line.startswith('https://'):
+            if line.startswith('https://'):
+                links.append(line + '-1.0.0')
                 extras = ''
                 if '[' in line:
                     extras = '[' + line.split('[')[1].split(']')[0] + ']'
