@@ -211,7 +211,7 @@ def run(website, driver):
     return saved_sequence
 
 
-def run_all():
+def run_all(website):
     # Environmental vars set to overwrite default location of .gcda files
     if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
         prefix = '/builds/worker/workspace/build/src/'
@@ -224,75 +224,70 @@ def run_all():
     os.environ['GCOV_PREFIX_STRIP'] = str(strip_count)
     os.environ['PATH'] += os.pathsep + os.path.abspath('tools')
     os.environ['MOZ_HEADLESS'] = '1'
-    with open('websites.txt') as f:
-        for i, website in enumerate(f):
-            already_clicked_elems.clear()
-            # Create temporary directories with context manager
-            with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as jsvm_dir:
-                os.environ['GCOV_PREFIX'] = gcov_dir
-                os.environ['JS_CODE_COVERAGE_OUTPUT_DIR'] = jsvm_dir
+    already_clicked_elems.clear()
+    # Create temporary directories with context manager
+    with tempfile.TemporaryDirectory() as gcov_dir, tempfile.TemporaryDirectory() as jsvm_dir:
+        os.environ['GCOV_PREFIX'] = gcov_dir
+        os.environ['JS_CODE_COVERAGE_OUTPUT_DIR'] = jsvm_dir
 
-                # Webdriver uses Firefox Binaries from downloaded cov build
-                driver = webdriver.Firefox(firefox_binary='tools/firefox/firefox-bin')
+        # Webdriver uses Firefox Binaries from downloaded cov build
+        driver = webdriver.Firefox(firefox_binary='tools/firefox/firefox-bin')
 
-                set_timeouts(driver)
+        set_timeouts(driver)
 
-                # All steps are stored in new folder
-                data_folder = str(uuid.uuid4())
-                os.makedirs(data_folder, exist_ok=True)
+        # All steps are stored in new folder
+        data_folder = str(uuid.uuid4())
+        os.makedirs(data_folder, exist_ok=True)
+        try:
+            sequence = run(website, driver)
+            with open('{}/steps.txt'.format(data_folder), 'w') as f:
+                f.write('Website name: ' + website + '\n')
+                for element in sequence:
+                    f.write(json.dumps(element) + '\n')
+        except:  # noqa: E722
+            traceback.print_exc()
+            close_all_windows_except_first(driver)
 
-                if os.path.exists('{}/{}.txt'.format(data_folder, i)):
-                    continue
+        # Add paths to Mozilla-central modules
+        sys.path.insert(0, 'tools/mozbuild/codecoverage')
+        sys.path.insert(0, 'tools')
 
-                try:
-                    sequence = run(website, driver)
-                    with open('{}/{}.txt'.format(data_folder, i), 'w') as f:
-                        f.write('Website name: ' + website + '\n')
-                        for element in sequence:
-                            f.write(json.dumps(element) + '\n')
-                except:  # noqa: E722
-                    traceback.print_exc()
-                    close_all_windows_except_first(driver)
+        from lcov_rewriter import LcovFileRewriter
+        jsvm_files = [os.path.join(jsvm_dir, e) for e in os.listdir(jsvm_dir)]
+        rewriter = LcovFileRewriter(os.path.join('tools', 'chrome-map.json'))
+        jsvm_output_dir = os.path.join(jsvm_dir, 'jsvm_output')
+        os.makedirs(jsvm_output_dir, exist_ok=True)
+        jsvm_output_file = os.path.join(jsvm_output_dir, 'jsvm_lcov_output.info')
+        rewriter.rewrite_files(jsvm_files, jsvm_output_file, '')
 
-                # Add paths to Mozilla-central modules
-                sys.path.insert(0, 'tools/mozbuild/codecoverage')
-                sys.path.insert(0, 'tools')
+        grcov_command = [
+            os.path.join('tools', 'grcov'),
+            '-t', 'coveralls+',
+            '-p', prefix,
+            'tools', gcov_dir,
+            jsvm_output_dir,
+            '--filter', 'covered',
+            '--token', 'UNUSED',
+            '--commit-sha', 'UNUSED'
+        ]
 
-                from lcov_rewriter import LcovFileRewriter
+        with open('output.json', 'w+') as outfile:
+            subprocess.check_call(grcov_command, stdout=outfile)
 
-                jsvm_files = [os.path.join(jsvm_dir, e) for e in os.listdir(jsvm_dir)]
-                rewriter = LcovFileRewriter(os.path.join('tools', 'chrome-map.json'))
-                jsvm_output_dir = os.path.join(jsvm_dir, 'jsvm_output')
-                os.makedirs(jsvm_output_dir, exist_ok=True)
-                jsvm_output_file = os.path.join(jsvm_output_dir, 'jsvm_lcov_output.info')
-                rewriter.rewrite_files(jsvm_files, jsvm_output_file, '')
+        with open('tests_report.json') as baseline_rep, open('output.json') as rep:
+            baseline_report = json.load(baseline_rep)
+            report = json.load(rep)
 
-                grcov_command = [
-                    os.path.join('tools', 'grcov'),
-                    '-t', 'coveralls+',
-                    '-p', prefix,
-                    'tools', gcov_dir,
-                    jsvm_output_dir,
-                    '--filter', 'covered',
-                    '--token', 'UNUSED',
-                    '--commit-sha', 'UNUSED'
-                ]
+        filterpaths.ignore_third_party_filter(report)
 
-                with open('output.json', 'w+') as outfile:
-                    subprocess.check_call(grcov_command, stdout=outfile)
+        # Create diff report
+        diff_report = diff.compare_reports(baseline_report, report, True)
 
-                with open('tests_report.json') as baseline_rep, open('output.json') as rep:
-                    baseline_report = json.load(baseline_rep)
-                    report = json.load(rep)
+        with open('{}/diff.json'.format(data_folder), 'w') as outfile:
+            json.dump(diff_report, outfile)
 
-                filterpaths.ignore_third_party_filter(report)
+        generatehtml.generate_html(data_folder)
 
-                # Create diff report
-                diff_report = diff.compare_reports(baseline_report, report, True)
+        driver.quit()
 
-                with open('{}/diff.json'.format(data_folder), 'w') as outfile:
-                    json.dump(diff_report, outfile)
-
-                generatehtml.generate_html(data_folder)
-
-                driver.quit()
+        return '{}/report'.format(data_folder)

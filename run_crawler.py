@@ -2,4 +2,6 @@
 
 from coverage_crawler import crawler
 
-crawler.run_all()
+with open('websites.txt') as f:
+    for website in f:
+        report = crawler.run_all(website)
