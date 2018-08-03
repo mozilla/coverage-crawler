@@ -290,4 +290,4 @@ def run(website):
 
         driver.quit()
 
-        return '{}/report'.format(data_folder)
+        return os.path.abspath(os.path.join(os.getcwd(), '{}/report'.format(data_folder)))
