@@ -1,4 +1,4 @@
 selenium==3.13.0
-six==1.10.0
+six==1.11.0
 taskcluster==4.0.0
 https://github.com/marco-c/firefox-code-coverage/archive/cc386da20f389fd5159746d56729e149029de6ae.tar.gz#egg=firefox_code_coverage
