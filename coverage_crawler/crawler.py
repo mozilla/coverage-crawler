@@ -289,5 +289,5 @@ def run(website):
         generatehtml.generate_html(data_folder)
 
         driver.quit()
-
+        
         return os.path.abspath(os.path.join(os.getcwd(), data_folder))
