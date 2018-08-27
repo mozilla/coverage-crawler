@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import argparse
 import os
 import platform
 import subprocess
@@ -116,14 +115,3 @@ def download_artifacts(revision=None):
         subprocess.call(['hg', 'update', '--rev', revision])
     else:
         subprocess.call(['hg', 'clone', 'https://hg.mozilla.org/mozilla-central/', '--rev', revision])
-
-
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--revision', action='store', nargs='?', help='Optional revision of the build')
-    args = parser.parse_args()
-    download_artifacts(args.revision)
-
-
-if __name__ == '__main__':
-    main()
