@@ -48,6 +48,7 @@ def download_artifacts(revision=None):
     # Download artifacts
     for name in ['target.tar.bz2', 'target.code-coverage-gcno.zip', 'chrome-map.json', 'target.common.tests.zip']:
         url = queue.buildUrl('getLatestArtifact', taskId, 'public/build/{}'.format(name))
+        print('Downloading {}...'.format(url))
         urlretrieve(url, os.path.join('tools', name))
 
     # Geckodriver base url fot the latest version
@@ -81,10 +82,12 @@ def download_artifacts(revision=None):
     # Download geckodriver
     geckodriver_archive = os.path.join('tools', version)
     geckodriver_url += version
+    print('Downloading {}...'.format(geckodriver_url))
     urlretrieve(geckodriver_url, geckodriver_archive)
 
     # Download grcov
     grcov_archive = os.path.join('tools', 'grcov.tar.bz2')
+    print('Downloading {}...'.format(grcov_url))
     urlretrieve(grcov_url, grcov_archive)
 
     # Extract and delete archives for artifacts
@@ -102,13 +105,17 @@ def download_artifacts(revision=None):
         os.remove(filename)
 
     # Download Firefox coverage report
+    print('Downloading coverage artifacts...')
     codecoverage.download_coverage_artifacts(taskId, None, None, 'ccov-artifacts')
+    print('Generating report...')
     codecoverage.generate_report('tools/grcov', 'coveralls+', 'tests_report.json', 'ccov-artifacts')
 
     # Download genhtml
+    print('Downloading genhtml...')
     codecoverage.download_genhtml()
 
     # Clone if the repository doesn't exist yet. Otherwise, update.
+    print('Cloning/Updating mozilla-central repository...')
     if os.path.isdir('mozilla-central'):
         os.chdir('mozilla-central')
         subprocess.call(['hg', 'pull', '--rev', revision, 'https://hg.mozilla.org/mozilla-central/'])
