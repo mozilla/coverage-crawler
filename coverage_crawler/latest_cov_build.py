@@ -46,7 +46,7 @@ def download_artifacts(revision=None):
         taskId = task_data['taskId']
 
     # Download artifacts
-    for name in ['target.tar.bz2', 'target.code-coverage-gcno.zip', 'chrome-map.json', 'target.common.tests.zip']:
+    for name in ['target.tar.bz2', 'target.code-coverage-gcno.zip', 'chrome-map.json', 'target.common.tests.tar.gz']:
         url = queue.buildUrl('getLatestArtifact', taskId, 'public/build/{}'.format(name))
         print('Downloading {}...'.format(url))
         urlretrieve(url, os.path.join('tools', name))
@@ -91,7 +91,7 @@ def download_artifacts(revision=None):
     urlretrieve(grcov_url, grcov_archive)
 
     # Extract and delete archives for artifacts
-    for filename in ['tools/target.code-coverage-gcno.zip', 'tools/target.tar.bz2', geckodriver_archive, grcov_archive, 'tools/target.common.tests.zip']:
+    for filename in ['tools/target.code-coverage-gcno.zip', 'tools/target.tar.bz2', geckodriver_archive, grcov_archive, 'tools/target.common.tests.tar.gz']:
         if filename.endswith('zip'):
             with zipfile.ZipFile(filename, 'r') as zip_ref:
                 zip_ref.extractall(path='tools')
