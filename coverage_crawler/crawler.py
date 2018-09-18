@@ -44,7 +44,7 @@ def wait_loaded(driver):
           }
         """)
     except:  # noqa: E722
-        traceback.print_exc()
+        traceback.print_exc(file=sys.stderr)
         print('Continuing...')
 
     # We hope the page is fully loaded in 7 seconds.
@@ -57,7 +57,7 @@ def wait_loaded(driver):
           });
         """)
     except:  # noqa: E722
-        traceback.print_exc()
+        traceback.print_exc(file=sys.stderr)
         print('Continuing...')
 
 
@@ -163,7 +163,7 @@ def do_something(driver):
 
         except (ElementNotInteractableException, StaleElementReferenceException, InvalidSelectorException, WebDriverException):
             # Ignore frequent exceptions.
-            traceback.print_exc()
+            traceback.print_exc(file=sys.stderr)
             not_clickable_elems.add(elem)
             close_all_windows_except_first(driver)
 
@@ -188,7 +188,7 @@ def run_in_driver(website, driver):
         driver.get(website)
     except TimeoutException as e:
         # Ignore timeouts, as they are too frequent.
-        traceback.print_exc()
+        traceback.print_exc(file=sys.stderr)
         print('Continuing...')
 
     saved_sequence = []
@@ -204,7 +204,7 @@ def run_in_driver(website, driver):
             print('  - Using {}'.format(elem_attributes))
         except TimeoutException:
             # Ignore frequent Timeout exceptions.
-            traceback.print_exc()
+            traceback.print_exc(file=sys.stderr)
             print('Continuing...')
 
     return saved_sequence
@@ -245,7 +245,7 @@ def run(websites):
                     for element in sequence:
                         f.write(json.dumps(element) + '\n')
             except:  # noqa: E722
-                traceback.print_exc()
+                traceback.print_exc(file=sys.stderr)
                 close_all_windows_except_first(driver)
 
         # Add paths to Mozilla-central modules
