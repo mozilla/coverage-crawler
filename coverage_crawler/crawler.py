@@ -103,9 +103,6 @@ def do_something(driver):
                 children = list(set(children) - already_clicked_elems)
 
             for child in children:
-                # Get all the attributes of the child.
-                child_attributes = get_all_attributes(driver, child)
-
                 # If the element is not displayed or is disabled, the user can't interact with it. Skip
                 # non-displayed/disabled elements, since we're trying to mimic a real user.
                 if not child.is_displayed() or not child.is_enabled() or child in not_clickable_elems:
@@ -161,7 +158,8 @@ def do_something(driver):
 
             close_all_windows_except_first(driver)
 
-            return child_attributes
+            # Get all the attributes of the child.
+            return get_all_attributes(driver, child)
 
         except (ElementNotInteractableException, StaleElementReferenceException, InvalidSelectorException, WebDriverException):
             # Ignore frequent exceptions.
