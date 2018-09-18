@@ -211,7 +211,7 @@ def run_in_driver(website, driver):
     return saved_sequence
 
 
-def run(website):
+def run(websites):
     # Environmental vars set to overwrite default location of .gcda files
     if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
         prefix = '/builds/worker/workspace/build/src/'
@@ -235,18 +235,19 @@ def run(website):
 
         set_timeouts(driver)
 
-        # All steps are stored in new folder
-        data_folder = str(uuid.uuid4())
-        os.makedirs(data_folder, exist_ok=True)
-        try:
-            sequence = run_in_driver(website, driver)
-            with open('{}/steps.txt'.format(data_folder), 'w') as f:
-                f.write('Website name: ' + website + '\n')
-                for element in sequence:
-                    f.write(json.dumps(element) + '\n')
-        except:  # noqa: E722
-            traceback.print_exc()
-            close_all_windows_except_first(driver)
+        for website in websites:
+            # All steps are stored in new folder
+            data_folder = str(uuid.uuid4())
+            os.makedirs(data_folder, exist_ok=True)
+            try:
+                sequence = run_in_driver(website, driver)
+                with open('{}/steps.txt'.format(data_folder), 'w') as f:
+                    f.write('Website name: ' + website + '\n')
+                    for element in sequence:
+                        f.write(json.dumps(element) + '\n')
+            except:  # noqa: E722
+                traceback.print_exc()
+                close_all_windows_except_first(driver)
 
         # Add paths to Mozilla-central modules
         sys.path.insert(0, 'tools/mozbuild/codecoverage')
