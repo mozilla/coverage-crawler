@@ -193,6 +193,7 @@ def run_in_driver(website, driver):
 
     saved_sequence = []
     for i in range(0, 20):
+        print('Iteration {}'.format(i))
         try:
             elem_attributes = do_something(driver)
             if elem_attributes is None:
