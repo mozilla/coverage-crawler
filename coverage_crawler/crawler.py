@@ -78,24 +78,31 @@ def close_all_windows_except_first(driver):
     driver.switch_to_window(windows[0])
 
 
+def find_children(driver):
+    body = driver.find_elements_by_tag_name('body')
+    assert len(body) == 1
+    body = body[0]
+
+    body.send_keys(Keys.CONTROL, 0)
+
+    buttons = body.find_elements_by_tag_name('button')
+    links = body.find_elements_by_tag_name('a')
+    inputs = body.find_elements_by_tag_name('input')
+    selects = body.find_elements_by_tag_name('select')
+    children = buttons + links + inputs + selects
+
+    random.shuffle(children)
+
+    return children
+
+
 def do_something(driver):
     not_clickable_elems = set()
 
+    children = find_children(driver)
+
     while True:
         elem = None
-        body = driver.find_elements_by_tag_name('body')
-        assert len(body) == 1
-        body = body[0]
-
-        body.send_keys(Keys.CONTROL, 0)
-
-        buttons = body.find_elements_by_tag_name('button')
-        links = body.find_elements_by_tag_name('a')
-        inputs = body.find_elements_by_tag_name('input')
-        selects = body.find_elements_by_tag_name('select')
-        children = buttons + links + inputs + selects
-
-        random.shuffle(children)
 
         try:
             # If we have clickable elements on which we haven't clicked yet, use them; otherwise, use all elements
@@ -161,11 +168,16 @@ def do_something(driver):
             # Get all the attributes of the child.
             return get_all_attributes(driver, child)
 
-        except (ElementNotInteractableException, StaleElementReferenceException, InvalidSelectorException, WebDriverException):
+        except StaleElementReferenceException:
+            traceback.print_exc(file=sys.stderr)
+            close_all_windows_except_first(driver)
+            children = find_children(driver)
+
+        except (ElementNotInteractableException, InvalidSelectorException, WebDriverException):
             # Ignore frequent exceptions.
             traceback.print_exc(file=sys.stderr)
-            not_clickable_elems.add(elem)
             close_all_windows_except_first(driver)
+            not_clickable_elems.add(elem)
 
 
 def get_all_attributes(driver, child):
