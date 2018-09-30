@@ -8,4 +8,4 @@ flake8-mypy==17.8.0
 attrs==18.2.0
 pytest==3.8.1
 setuptools==40.4.3
-wheel==0.31.1
+wheel==0.32.0
