@@ -198,7 +198,7 @@ def run_in_driver(website, driver):
 
     try:
         driver.get(website)
-    except TimeoutException as e:
+    except TimeoutException:
         # Ignore timeouts, as they are too frequent.
         traceback.print_exc(file=sys.stderr)
         print('Continuing...')

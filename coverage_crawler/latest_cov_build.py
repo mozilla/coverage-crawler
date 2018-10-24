@@ -35,8 +35,7 @@ def download_artifacts(revision=None):
     queue = taskcluster.Queue()
 
     if revision is None:
-        taskId = index.findTask('gecko.v2.mozilla-central.' +
-                                'latest.firefox.linux64-ccov-debug')['taskId']
+        taskId = index.findTask('gecko.v2.mozilla-central.' + 'latest.firefox.linux64-ccov-debug')['taskId']
         r = requests.get('https://queue.taskcluster.net/v1/task/{}'.format(taskId))
         task_data = r.json()
         revision = task_data['payload']['env']['GECKO_HEAD_REV']
