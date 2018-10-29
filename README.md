@@ -3,6 +3,11 @@
 
 A crawler to find websites that exercise code in Firefox that is not covered by unit tests
 
+## Software requirements
+
+- You should have Python version>=3.5 and pip for Python version >=3.5 installed on your computer to run the program. 
+
+
 ## Usage as a script
 
 - Install requirements with `pip install -r requirements.txt`;
