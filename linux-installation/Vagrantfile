@@ -1,0 +1,44 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "bento/ubuntu-16.04"
+  config.vm.synced_folder ".", "/vagrant"
+  config.vm.network "private_network", type: "dhcp"
+
+  # Work around disconnected virtual network cable.
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = 4048
+  end
+
+  config.vm.provision "shell", inline: <<-SHELL
+    apt-get -qqy update
+
+    # Work around https://github.com/chef/bento/issues/661
+    # apt-get -qqy upgrade
+    DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade
+
+    apt-get update
+    apt-get install -y git
+    curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+    apt-get install -y nodejs
+    apt-get install -y build-essential
+    npm install -g npm
+    sudo apt-get install python3.5
+    wget https://bootstrap.pypa.io/get-pip.py
+    sudo python3.5 get-pip.py
+    pip3.5 --version
+    rm get-pip.py
+    sudo add-apt-repository -y ppa:mercurial-ppa/releases
+    sudo apt-get update
+    sudo apt-get install -y mercurial
+    apt-get update
+    apt-get upgrade -y
+    apt-get autoremove -y
+
+    make
+    make install
+
+    echo "Done installing your virtual machine!"
+  SHELL
+end
