@@ -5,7 +5,7 @@ A crawler to find websites that exercise code in Firefox that is not covered by 
 
 ## Software requirements
 
-- You will need python>=3.5, pip for python>=3.5 and [Mercurial](https://www.mercurial-scm.org/) source control management tools installed on your machine to run the script.
+- You will need python>=3.6, pip for python>=3.6 and [Mercurial](https://www.mercurial-scm.org/) source control management tools installed on your machine to run the script.
 
 - For easy environment setup, please take a look at `/easy-environment-setup` folder.
 

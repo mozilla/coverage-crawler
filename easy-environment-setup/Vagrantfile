@@ -24,14 +24,20 @@ Vagrant.configure("2") do |config|
     apt-get install -y nodejs
     apt-get install -y build-essential
     npm install -g npm
-    sudo apt-get install python3.5
+
+    sudo add-apt-repository ppa:jonathonf/python-3.6
+    sudo apt-get update
+    sudo apt-get install python3.6 
     wget https://bootstrap.pypa.io/get-pip.py
-    sudo python3.5 get-pip.py
-    pip3.5 --version
+    sudo python3.6 get-pip.py
+    pip3.6 --version
     rm get-pip.py
+    alias pip=pip3.6
+    alias python=python3.6
     sudo add-apt-repository -y ppa:mercurial-ppa/releases
     sudo apt-get update
     sudo apt-get install -y mercurial
+
     apt-get update
     apt-get upgrade -y
     apt-get autoremove -y

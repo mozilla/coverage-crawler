@@ -4,11 +4,12 @@ Following set up will be done on ubuntu-16.04. You can either use existing Vagra
 
 ## Software installation
 
+
 ### Vagrant and Virtual Box solution
 
 This is an Ubuntu 16.04.5 LTS (GNU/Linux 4.4.0-116-generic x86_64) installation using vagrant and virtual box.
 
-If you want to configuare your own Ubuntu VM via this Vagrantfile you should follow these steps:
+If you want to configure your own Ubuntu VM via this Vagrantfile you should follow these steps:
 
 1. Install VirtualBox.
 2. Install Vagrant.
@@ -25,7 +26,7 @@ brew cask install vagrant
 brew cask install virtualbox
 ```
 
-3. Clone Vagrantfile from this directory to create similar Ubuntu 16.04 machine via python, pip and mercurial tools.
+3. Clone Vagrantfile from this directory to create similar Ubuntu 16.04 machine via python, pip and mercurial tools. Please, copy this file to a folder with a project you want to work on.
 
 4. Run `vagrant up` to create and install your Linux VM:
 
@@ -37,20 +38,27 @@ Run `vagrant ssh` to connect:
 ```
 vagrant ssh
 ```
+5. Shared folder:
+If you connected to vagrant via `vagrant ssh`, you can run `cd /vagrant`  to go to folder shared between vm and your computer.
+
 
 
 ### Manual set up
 
-You will need python>=3.5, pip for python>=3.5 and [Mercurial](https://www.mercurial-scm.org/) source control management tool installed on your machine to run the script.
+You will need python>=3.6, pip for python>=3.6 and [Mercurial](https://www.mercurial-scm.org/) source control management tool installed on your machine to run the script.
 
 Example installation on Ubuntu 16.04:
 
 ```
-sudo apt-get install python3.5
+sudo add-apt-repository ppa:jonathonf/python-3.6
+sudo apt-get update
+sudo apt-get install python3.6 
 wget https://bootstrap.pypa.io/get-pip.py
-sudo python3.5 get-pip.py
-pip3.5 --version
+sudo python3.6 get-pip.py
+pip3.6 --version
 rm get-pip.py
+alias pip=pip3.6
+alias python=python3.6
 sudo add-apt-repository -y ppa:mercurial-ppa/releases
 sudo apt-get update
 sudo apt-get install -y mercurial
@@ -64,25 +72,25 @@ sudo apt-get install -y mercurial
 
 1. Install requirements:
 ```
-sudo pip3 install -r requirements.txt
-sudo pip3 install -r test-requirements.txt
+sudo pip install -r requirements.txt
+sudo pip install -r test-requirements.txt
 ```
 
 2. Download artifacts:
 - Try:
 ```
-python3 download_artifacts.py
+python download_artifacts.py
 ```
 
 If you are facing `TaskclusterFailure: rootUrl option is required`, just do following:
 ```
-sudo pip3  uninstall taskcluster
-sudo pip3  install taskcluster==4.0.1
-python3 download_artifacts.py
+sudo pip uninstall taskcluster
+sudo pip install taskcluster==4.0.1
+python download_artifacts.py
 ```
 This is a taskcluster issue which was faced in Oct. 2018. 
 
 3. Run the crawler:
 ```
-python3 run_crawler.py
+python run_crawler.py
 ```
