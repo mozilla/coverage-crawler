@@ -26,13 +26,20 @@ def get_github_release_url(repo_slug):
     return download_url, tag_name
 
 
+def get_taskcluster_options():
+    return dict(
+        rootUrl=os.environ.get('TASKCLUSTER_ROOT_URL', 'https://taskcluster.net')
+    )
+
+
 def download_artifacts(revision=None):
     # Create 'tools/' directory if doesn't exist
     if not os.path.exists('tools'):
         os.makedirs('tools')
 
-    index = taskcluster.Index()
-    queue = taskcluster.Queue()
+    options = get_taskcluster_options()
+    index = taskcluster.Index(options)
+    queue = taskcluster.Queue(options)
 
     if revision is None:
         taskId = index.findTask('gecko.v2.mozilla-central.' + 'latest.firefox.linux64-ccov-debug')['taskId']
