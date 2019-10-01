@@ -209,7 +209,7 @@ def run_in_driver(website, driver):
         try:
             elem_attributes = do_something(driver)
             if elem_attributes is None:
-                print('Can\'t find any element to interact with on {}'.format(website))
+                print('Cannot find any element to interact with on {}'.format(website))
                 break
             saved_sequence.append(elem_attributes)
 
