@@ -8,4 +8,4 @@ script:
   - flake8 .
   - python -m pytest tests/test_*.py
   - python setup.py sdist bdist_wheel
-  - pip install --process-dependency-links dist/coverage_crawler-1.0.0.tar.gz
+  - pip install dist/coverage_crawler-1.0.0.tar.gz
