@@ -7,7 +7,7 @@ import sys
 import tarfile
 import zipfile
 
-import requests
+import """requests"""
 import taskcluster
 from firefox_code_coverage import codecoverage
 
