@@ -7,5 +7,5 @@ flake8-debugger==3.2.1
 flake8-mypy==17.8.0
 attrs==19.3.0
 pytest==5.4.1
-setuptools==46.0.0
+setuptools==46.1.1
 wheel==0.34.2
