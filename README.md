@@ -3,7 +3,7 @@
 
 A crawler to find websites that exercise code in Firefox that is not covered by unit tests
 
-## Software requirements
+## Software requirements (that shall be installed on your system)
 - Python 3.6+
 - [Mercurial](https://www.mercurial-scm.org/)
 
