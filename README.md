@@ -1,9 +1,9 @@
-# coverage-crawler
-[![Build Status](https://travis-ci.org/mozilla/coverage-crawler.svg?branch=master)](https://travis-ci.org/mozilla/coverage-crawler)
+# Coverage-Crawler
+[![Build a Status](https://travis-ci.org/mozilla/coverage-crawler.svg?branch=master)](https://travis-ci.org/mozilla/coverage-crawler)
 
-A crawler to find websites that exercise code in Firefox that is not covered by unit tests
+A Crawler to find Websites that exercise code in Firefox that is not covered by unit tests.
 
-## Software requirements
+## Software Requirements
 - Python 3.6+
 - [Mercurial](https://www.mercurial-scm.org/)
 
