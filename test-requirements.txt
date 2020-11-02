@@ -6,6 +6,6 @@ flake8-copyright==0.2.2
 flake8-debugger==3.2.1
 flake8-mypy==17.8.0
 attrs==20.2.0
-pytest==6.1.1
+pytest==6.1.2
 setuptools==50.3.2
 wheel==0.35.1
