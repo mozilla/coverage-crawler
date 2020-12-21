@@ -1,5 +1,5 @@
 # coverage-crawler
-[![Build Status](https://travis-ci.org/mozilla/coverage-crawler.svg?branch=master)](https://travis-ci.org/mozilla/coverage-crawler)
+[![Task Status](https://community-tc.services.mozilla.com/api/github/v1/repository/mozilla/coverage-crawler/master/badge.svg)](https://community-tc.services.mozilla.com/api/github/v1/repository/mozilla/coverage-crawler/master/latest)
 
 A crawler to find websites that exercise code in Firefox that is not covered by unit tests
 
