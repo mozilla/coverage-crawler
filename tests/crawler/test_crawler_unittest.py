@@ -1,3 +1,4 @@
+# encoding: utf-8
 import unittest
 
 from selenium import webdriver
@@ -18,12 +19,12 @@ class TestCrawler(unittest.TestCase):
     def test_close_all_windows_except_first(self):
         """
         when multiple windows are open,
-        verify that calling `close_all_windows_except_first` closes all except the first. 
+        verify that calling `close_all_windows_except_first` closes all except the first.
         """
-        _open_google_tab_script = 'window.open("https://google.com", "new window")'
+        _open_google_tab_script = 'window.open("", "new window")'
         self.driver.execute_script(_open_google_tab_script)
-        assert (len(self.driver.window_handles) == 2), "some windows were not opened properly."
+        assert (len(self.driver.window_handles) == 2), 'some windows were not opened properly.'
 
         crawler.close_all_windows_except_first(self.driver)
 
-        assert (len(self.driver.window_handles) == 1), "some windows were not closed properly."
+        assert (len(self.driver.window_handles) == 1), 'some windows were not closed properly.'
