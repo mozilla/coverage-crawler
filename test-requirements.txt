@@ -1,3 +1,4 @@
+importlib-metadata==4.13.0  # flake8 only supports versions < 5. detailed explanation in #536.
 flake8==3.8.4
 flake8-isort==4.0.0
 flake8-quotes==3.3.1
