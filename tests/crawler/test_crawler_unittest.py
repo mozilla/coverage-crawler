@@ -22,7 +22,7 @@ class TestCrawler(unittest.TestCase):
         verify that calling `close_all_windows_except_first` closes all except the first.
         """
         _open_tab_script = 'window.open("", "new window")'
-        self.driver.execute_script(_open_google_tab_script)
+        self.driver.execute_script(_open_tab_script)
         assert (len(self.driver.window_handles) == 2), 'some windows were not opened properly.'
 
         crawler.close_all_windows_except_first(self.driver)
