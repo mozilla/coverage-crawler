@@ -18,7 +18,7 @@ class TestCrawler(unittest.TestCase):
         self.driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
 
     def tearDown(self):
-        self.driver.close()
+        self.driver.quit()
 
     def test_close_all_windows_except_first(self):
         """
@@ -50,7 +50,7 @@ class TestCrawlerLive(unittest.TestCase):
         self.driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
 
     def tearDown(self):
-        self.driver.close()
+        self.driver.quit()
 
     def test_find_children(self):
         """
