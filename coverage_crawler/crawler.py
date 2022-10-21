@@ -65,17 +65,17 @@ def close_all_windows_except_first(driver):
     windows = driver.window_handles
 
     for window in windows[1:]:
-        driver.switch_to_window(window)
+        driver.switch_to.window(window)
         driver.close()
 
     while True:
         try:
-            alert = driver.switch_to_alert()
+            alert = driver.switch_to.alert()
             alert.dismiss()
         except (NoAlertPresentException, NoSuchWindowException):
             break
 
-    driver.switch_to_window(windows[0])
+    driver.switch_to.window(windows[0])
 
 
 def find_children(driver):
