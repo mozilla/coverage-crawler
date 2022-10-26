@@ -5,6 +5,7 @@ from flask import render_template
 WEBSITE_DOMAIN = 'localhost'
 WEBSITE_PORT = 8000
 WEBSITE_URL = f'{WEBSITE_DOMAIN}:{WEBSITE_PORT}'
+WEBSITE_TITLE = 'coverage-crawler example website'
 app = flask.Flask(__name__)
 
 

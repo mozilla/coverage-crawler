@@ -1,14 +1,14 @@
 # encoding: utf-8
 import multiprocessing
 import unittest
-from time import sleep
 
 from selenium import webdriver
+from selenium.common.exceptions import WebDriverException
 from webdriver_manager.firefox import GeckoDriverManager
 
 from coverage_crawler import crawler
 from tests.example_website import website_app
-from tests.example_website.website_app import run_server
+from tests.example_website.website_app import run_server, WEBSITE_TITLE
 
 
 class TestCrawler(unittest.TestCase):
@@ -35,11 +35,26 @@ class TestCrawler(unittest.TestCase):
 
 
 class TestCrawlerLive(unittest.TestCase):
+    SERVER_SETUP_TRIES = 10
+
     @classmethod
     def setUpClass(cls):
         cls.server = multiprocessing.Process(target=run_server)
         cls.server.start()
-        sleep(1)
+        test_driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        for try_id in range(cls.SERVER_SETUP_TRIES):
+            try:
+                print(f"class setup tries: {try_id}/{cls.SERVER_SETUP_TRIES}")
+                test_driver.get(website_app.WEBSITE_URL)
+                assert test_driver.title == WEBSITE_TITLE
+                test_driver.quit()
+                return
+            except WebDriverException as e:
+                print("got exception:", e)
+
+        cls.server.terminate()
+        cls.server.join()
+        cls.fail(cls, "website did not start up correctly.")
 
     @classmethod
     def tearDownClass(cls):
@@ -57,11 +72,10 @@ class TestCrawlerLive(unittest.TestCase):
         when example server is open,
         verify that find_children returns the expected children.
         """
-        expected_title = 'coverage-crawler example website'
         expected_link_text = 'i am the first link in the first div'
 
         self.driver.get(website_app.WEBSITE_URL)
-        assert (self.driver.title == expected_title), f'incorrect driver title: {self.driver.title}'
+        assert (self.driver.title == WEBSITE_TITLE), f'incorrect driver title: {self.driver.title}'
 
         children = crawler.find_children(self.driver)
         num_children = len(children)
