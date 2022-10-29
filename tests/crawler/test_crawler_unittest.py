@@ -42,16 +42,17 @@ class TestCrawlerLive(unittest.TestCase):
     def setUpClass(cls):
         cls.server = multiprocessing.Process(target=run_server)
         cls.server.start()
-        test_driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-        for try_id in range(cls.SERVER_SETUP_TRIES):
-            try:
+
+        try:
+            test_driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+            for try_id in range(cls.SERVER_SETUP_TRIES):
                 print(f'class setup tries: {try_id}/{cls.SERVER_SETUP_TRIES}')
                 test_driver.get(website_app.WEBSITE_URL)
                 assert test_driver.title == WEBSITE_TITLE
                 test_driver.quit()
                 return
-            except WebDriverException as e:
-                print('got exception:', e)
+        except WebDriverException as e:
+            print('got exception:', e)
 
         cls.server.terminate()
         cls.server.join()
@@ -71,7 +72,7 @@ class TestCrawlerLive(unittest.TestCase):
     def test_find_children(self):
         """
         when example server is open,
-        verify that find_children returns the expected children.
+        verify that `find_children` returns the expected children.
         """
         expected_link_text = 'i am the first link in the first div'
 
@@ -82,3 +83,19 @@ class TestCrawlerLive(unittest.TestCase):
         num_children = len(children)
         assert (num_children == 1), f'incorrect number of children found: {num_children}'
         assert (children[0].text == expected_link_text)
+
+    def test_get_all_attributes(self):
+        """
+        when example server is open,
+        verify that `get_all_attributes` returns the expected attributes.
+        """
+        expected_attribute = 'href'
+
+        self.driver.get(website_app.WEBSITE_URL)
+        assert (self.driver.title == WEBSITE_TITLE), f'incorrect driver title: {self.driver.title}'
+
+        child = crawler.find_children(self.driver)[0]
+        attributes = crawler.get_all_attributes(self.driver, child)
+        num_attributes = len(attributes)
+        assert (num_attributes == 1), f'incorrect number of attributes found: {num_attributes}'
+        assert (expected_attribute in attributes), f'expected attribute is missing: {expected_attribute}'
