@@ -9,6 +9,7 @@ import tempfile
 import time
 import traceback
 import uuid
+from typing import Set
 
 from selenium import webdriver
 from selenium.common.exceptions import ElementNotInteractableException
@@ -19,6 +20,7 @@ from selenium.common.exceptions import StaleElementReferenceException
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.firefox.webelement import FirefoxWebElement
 
 from coverage_crawler import diff
 from coverage_crawler import filterpaths
@@ -78,7 +80,7 @@ def close_all_windows_except_first(driver):
     driver.switch_to.window(windows[0])
 
 
-def find_children(driver):
+def find_children(driver: webdriver.Firefox):
     body = driver.find_elements_by_tag_name('body')
     assert len(body) == 1
     body = body[0]
@@ -96,88 +98,112 @@ def find_children(driver):
     return children
 
 
-def do_something(driver):
-    not_clickable_elems = set()
-
+def find_next_unclicked_element_in_page(driver: webdriver.Firefox, not_clickable_elems: Set):
+    """
+    relies on global variable `already_clicked_elems` to return the next child that
+    was not interacted with yet.
+    :param driver: the driver with which we look for a child.
+    :param not_clickable_elems: a set of elements which cannot be interacted with.
+    :return: None, if all children were interacted with.
+    :return: the next interactable child, otherwise.
+    """
     children = find_children(driver)
 
+    # If we have clickable elements on which we haven't clicked yet, use them; otherwise, use all elements
+    if set(children) - already_clicked_elems > not_clickable_elems:
+        children = list(set(children) - already_clicked_elems)
+
+    for child in children:
+        # If the element is not displayed or is disabled, the user can't interact with it. Skip
+        # non-displayed/disabled elements, since we're trying to mimic a real user.
+        if not child.is_displayed() or not child.is_enabled() or child in not_clickable_elems:
+            continue
+
+        return child
+
+    return None
+
+
+def perform_action_on_element(element: FirefoxWebElement) -> None:
+    """
+    interact with a given element, e.g. by sending keys or clicking on it.
+    :param element: the element to be interacted with.
+    :raise: NotImplementedError, if an unsupported element type was found.
+    """
+    if element.tag_name in ['button', 'a']:
+        element.click()
+    elif element.tag_name == 'input':
+        input_type = element.get_attribute('type')
+        if input_type == 'url':
+            element.send_keys('http://www.mozilla.org/')
+        elif input_type == 'text':
+            element.send_keys('marco')
+        elif input_type == 'email':
+            element.send_keys('prova@email.it')
+        elif input_type == 'password':
+            element.send_keys('aMildlyComplexPasswordIn2017')
+        elif input_type == 'checkbox':
+            element.click()
+        elif input_type == 'number':
+            element.send_keys('3')
+        elif input_type in ['submit', 'reset', 'button']:
+            element.click()
+        elif input_type == 'color':
+            driver.execute_script("arguments[0].value = '#ff0000'", element)
+        elif input_type == 'search':
+            element.clear()
+            element.send_keys('quick search')
+        elif input_type == 'radio':
+            element.click()
+        elif input_type == 'tel':
+            element.send_keys('1234567890')
+        elif input_type == 'date':
+            element.send_keys('20000101')
+        else:
+            raise NotImplementedError(f'Unsupported input type: {input_type}')
+    elif element.tag_name == 'select':
+        for option in element.find_elements_by_tag_name('option'):
+            if option.text != '':
+                option.click()
+                return
+
+
+def perform_action_on_page(driver: webdriver.Firefox):
+    """
+    interact with a single element on the current page, e.g. by sending keys or clicking on it.
+    relies on global variable `already_clicked_elems` to interact with the next child that
+    was not interacted with yet.
+    :param driver: the driver with which we interact.
+    :return: None, if there are no clickable items.
+    :return: a list of attributes of the last element with which we interacted.
+    """
+    not_clickable_elems = set()
+
     while True:
-        elem = None
-
         try:
-            # If we have clickable elements on which we haven't clicked yet, use them; otherwise, use all elements
-            if set(children) - already_clicked_elems > not_clickable_elems:
-                children = list(set(children) - already_clicked_elems)
+            element = find_next_unclicked_element_in_page(driver, not_clickable_elems)
 
-            for child in children:
-                # If the element is not displayed or is disabled, the user can't interact with it. Skip
-                # non-displayed/disabled elements, since we're trying to mimic a real user.
-                if not child.is_displayed() or not child.is_enabled() or child in not_clickable_elems:
-                    continue
-
-                elem = child
-                break
-
-            if elem is None:
+            if element is None:
                 return None
 
-            driver.execute_script('return arguments[0].scrollIntoView();', elem)
+            driver.execute_script('return arguments[0].scrollIntoView();', element)
             time.sleep(1)
 
-            if elem.tag_name in ['button', 'a']:
-                elem.click()
-            elif elem.tag_name == 'input':
-                input_type = elem.get_attribute('type')
-                if input_type == 'url':
-                    elem.send_keys('http://www.mozilla.org/')
-                elif input_type == 'text':
-                    elem.send_keys('marco')
-                elif input_type == 'email':
-                    elem.send_keys('prova@email.it')
-                elif input_type == 'password':
-                    elem.send_keys('aMildlyComplexPasswordIn2017')
-                elif input_type == 'checkbox':
-                    elem.click()
-                elif input_type == 'number':
-                    elem.send_keys('3')
-                elif input_type in ['submit', 'reset', 'button']:
-                    elem.click()
-                elif input_type == 'color':
-                    driver.execute_script("arguments[0].value = '#ff0000'", elem)
-                elif input_type == 'search':
-                    elem.clear()
-                    elem.send_keys('quick search')
-                elif input_type == 'radio':
-                    elem.click()
-                elif input_type == 'tel':
-                    elem.send_keys('1234567890')
-                elif input_type == 'date':
-                    elem.send_keys('20000101')
-                else:
-                    raise Exception('Unsupported input type: %s' % input_type)
-            elif elem.tag_name == 'select':
-                for option in elem.find_elements_by_tag_name('option'):
-                    if option.text != '':
-                        option.click()
-                        break
-
-            already_clicked_elems.add(elem)
-
+            perform_action_on_element(element)
+            already_clicked_elems.add(element)
             close_all_windows_except_first(driver)
-
-            # Get all the attributes of the child.
-            return get_all_attributes(driver, child)
+            return get_all_attributes(driver, element)
 
         except StaleElementReferenceException:
+            # don't mark element as clicked if it was stale.
             traceback.print_exc(file=sys.stderr)
             close_all_windows_except_first(driver)
-            children = find_children(driver)
 
         except (ElementNotInteractableException, InvalidSelectorException, WebDriverException):
             # Ignore frequent exceptions.
             traceback.print_exc(file=sys.stderr)
             close_all_windows_except_first(driver)
-            not_clickable_elems.add(elem)
+            not_clickable_elems.add(element)
 
 
 def get_all_attributes(driver, child):

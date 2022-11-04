@@ -43,16 +43,16 @@ class TestCrawlerLive(unittest.TestCase):
         cls.server = multiprocessing.Process(target=run_server)
         cls.server.start()
 
-        try:
-            test_driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-            for try_id in range(cls.SERVER_SETUP_TRIES):
+        for try_id in range(cls.SERVER_SETUP_TRIES):
+            try:
                 print(f'class setup tries: {try_id}/{cls.SERVER_SETUP_TRIES}')
-                test_driver.get(website_app.WEBSITE_URL)
-                assert test_driver.title == WEBSITE_TITLE
-                test_driver.quit()
+                with webdriver.Firefox(executable_path=GeckoDriverManager().install()) as test_driver:
+                    test_driver.get(website_app.WEBSITE_URL)
+                    assert test_driver.title == WEBSITE_TITLE
+
                 return
-        except WebDriverException as e:
-            print('got exception:', e)
+            except WebDriverException as e:
+                print('got exception:', e)
 
         cls.server.terminate()
         cls.server.join()
