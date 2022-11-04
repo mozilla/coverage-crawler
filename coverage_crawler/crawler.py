@@ -18,6 +18,7 @@ from selenium.common.exceptions import NoSuchWindowException
 from selenium.common.exceptions import StaleElementReferenceException
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import WebDriverException
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
 from coverage_crawler import diff
@@ -79,16 +80,16 @@ def close_all_windows_except_first(driver):
 
 
 def find_children(driver):
-    body = driver.find_elements_by_tag_name('body')
+    body = driver.find_elements(By.TAG_NAME, 'body')
     assert len(body) == 1
     body = body[0]
 
     body.send_keys(Keys.CONTROL, 0)
 
-    buttons = body.find_elements_by_tag_name('button')
-    links = body.find_elements_by_tag_name('a')
-    inputs = body.find_elements_by_tag_name('input')
-    selects = body.find_elements_by_tag_name('select')
+    buttons = body.find_elements(By.TAG_NAME, 'button')
+    links = body.find_elements(By.TAG_NAME, 'a')
+    inputs = body.find_elements(By.TAG_NAME, 'input')
+    selects = body.find_elements(By.TAG_NAME, 'select')
     children = buttons + links + inputs + selects
 
     random.shuffle(children)
@@ -156,7 +157,7 @@ def do_something(driver):
                 else:
                     raise Exception('Unsupported input type: %s' % input_type)
             elif elem.tag_name == 'select':
-                for option in elem.find_elements_by_tag_name('option'):
+                for option in elem.find_elements(By.TAG_NAME, 'option'):
                     if option.text != '':
                         option.click()
                         break
