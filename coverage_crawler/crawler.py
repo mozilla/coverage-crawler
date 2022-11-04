@@ -124,9 +124,10 @@ def find_next_unclicked_element_in_page(driver: webdriver.Firefox, not_clickable
     return None
 
 
-def perform_action_on_element(element: FirefoxWebElement) -> None:
+def perform_action_on_element(driver: webdriver.Firefox, element: FirefoxWebElement) -> None:
     """
     interact with a given element, e.g. by sending keys or clicking on it.
+    :param driver: the driver to be used for interaction.
     :param element: the element to be interacted with.
     :raise: NotImplementedError, if an unsupported element type was found.
     """
@@ -180,6 +181,7 @@ def perform_action_on_page(driver: webdriver.Firefox):
     not_clickable_elems = set()
 
     while True:
+        element = None
         try:
             element = find_next_unclicked_element_in_page(driver, not_clickable_elems)
 
@@ -189,7 +191,7 @@ def perform_action_on_page(driver: webdriver.Firefox):
             driver.execute_script('return arguments[0].scrollIntoView();', element)
             time.sleep(1)
 
-            perform_action_on_element(element)
+            perform_action_on_element(driver, element)
             already_clicked_elems.add(element)
             close_all_windows_except_first(driver)
             return get_all_attributes(driver, element)
@@ -233,7 +235,7 @@ def run_in_driver(website, driver):
     for i in range(0, 20):
         print('Iteration {}'.format(i))
         try:
-            elem_attributes = do_something(driver)
+            elem_attributes = perform_action_on_page(driver)
             if elem_attributes is None:
                 print('Cannot find any element to interact with on {}'.format(website))
                 break
