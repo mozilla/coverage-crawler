@@ -19,6 +19,7 @@ from selenium.common.exceptions import NoSuchWindowException
 from selenium.common.exceptions import StaleElementReferenceException
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import WebDriverException
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.webelement import FirefoxWebElement
 
@@ -80,17 +81,17 @@ def close_all_windows_except_first(driver):
     driver.switch_to.window(windows[0])
 
 
-def find_children(driver: webdriver.Firefox):
-    body = driver.find_elements_by_tag_name('body')
+def find_children(driver : webdriver.Firefox):
+    body = driver.find_elements(By.TAG_NAME, 'body')
     assert len(body) == 1
     body = body[0]
 
     body.send_keys(Keys.CONTROL, 0)
 
-    buttons = body.find_elements_by_tag_name('button')
-    links = body.find_elements_by_tag_name('a')
-    inputs = body.find_elements_by_tag_name('input')
-    selects = body.find_elements_by_tag_name('select')
+    buttons = body.find_elements(By.TAG_NAME, 'button')
+    links = body.find_elements(By.TAG_NAME, 'a')
+    inputs = body.find_elements(By.TAG_NAME, 'input')
+    selects = body.find_elements(By.TAG_NAME, 'select')
     children = buttons + links + inputs + selects
 
     random.shuffle(children)
