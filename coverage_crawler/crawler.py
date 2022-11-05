@@ -21,7 +21,7 @@ from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.firefox.webelement import FirefoxWebElement
+from selenium.webdriver.remote.webelement import WebElement
 
 from coverage_crawler import diff
 from coverage_crawler import filterpaths
@@ -81,7 +81,7 @@ def close_all_windows_except_first(driver):
     driver.switch_to.window(windows[0])
 
 
-def find_children(driver : webdriver.Firefox):
+def find_children(driver: webdriver.Firefox):
     body = driver.find_elements(By.TAG_NAME, 'body')
     assert len(body) == 1
     body = body[0]
@@ -125,7 +125,7 @@ def find_next_unclicked_element_in_page(driver: webdriver.Firefox, not_clickable
     return None
 
 
-def perform_action_on_element(driver: webdriver.Firefox, element: FirefoxWebElement) -> None:
+def perform_action_on_element(driver: webdriver.Firefox, element: WebElement) -> None:
     """
     interact with a given element, e.g. by sending keys or clicking on it.
     :param driver: the driver to be used for interaction.

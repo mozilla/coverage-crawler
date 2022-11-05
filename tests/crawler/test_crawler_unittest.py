@@ -14,9 +14,16 @@ from tests.example_website.website_app import run_server
 
 class TestCrawler(unittest.TestCase):
     driver: webdriver.Firefox
+    DRIVER_SETUP_TRIES = 10
 
     def setUp(self):
-        self.driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        for try_id in range(self.DRIVER_SETUP_TRIES):
+            try:
+                print(f'driver setup tries: {try_id}/{self.DRIVER_SETUP_TRIES}')
+                self.driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+                return
+            except WebDriverException as e:
+                print('got exception:', e)
 
     def tearDown(self):
         self.driver.quit()
