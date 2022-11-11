@@ -43,7 +43,7 @@ tasks:
                pip install --quiet -r requirements.txt &&
                pip install --quiet -r test-requirements.txt &&
                flake8 . &&
-               python -m pytest tests/test_*.py &&
+               python -m pytest tests &&
                python setup.py sdist bdist_wheel &&
                pip install dist/coverage_crawler-1.0.0.tar.gz"
         metadata:
