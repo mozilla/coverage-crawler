@@ -20,6 +20,7 @@ from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.remote.webelement import WebElement
 
 from coverage_crawler import diff
 from coverage_crawler import filterpaths
@@ -97,13 +98,58 @@ def find_children(driver):
     return children
 
 
-def do_something(driver):
+def perform_action_on_element(driver: webdriver.Firefox, element: WebElement) -> None:
+    """
+    interact with a given element, e.g. by sending keys or clicking on it.
+    :param driver: the driver to be used for interaction.
+    :param element: the element to be interacted with.
+    :raise: NotImplementedError, if an unsupported element type was found.
+    """
+    if element.tag_name in ['button', 'a']:
+        element.click()
+    elif element.tag_name == 'input':
+        input_type = element.get_attribute('type')
+        if input_type == 'url':
+            element.send_keys('http://www.mozilla.org/')
+        elif input_type == 'text':
+            element.send_keys('marco')
+        elif input_type == 'email':
+            element.send_keys('prova@email.it')
+        elif input_type == 'password':
+            element.send_keys('aMildlyComplexPasswordIn2017')
+        elif input_type == 'checkbox':
+            element.click()
+        elif input_type == 'number':
+            element.send_keys('3')
+        elif input_type in ['submit', 'reset', 'button']:
+            element.click()
+        elif input_type == 'color':
+            driver.execute_script("arguments[0].value = '#ff0000'", element)
+        elif input_type == 'search':
+            element.clear()
+            element.send_keys('quick search')
+        elif input_type == 'radio':
+            element.click()
+        elif input_type == 'tel':
+            element.send_keys('1234567890')
+        elif input_type == 'date':
+            element.send_keys('20000101')
+        else:
+            raise Exception('Unsupported input type: %s' % input_type)
+    elif element.tag_name == 'select':
+        for option in element.find_elements(By.TAG_NAME, 'option'):
+            if option.text != '':
+                option.click()
+                return
+
+
+def perform_action_on_page(driver):
     not_clickable_elems = set()
 
     children = find_children(driver)
 
     while True:
-        elem = None
+        element = None
 
         try:
             # If we have clickable elements on which we haven't clicked yet, use them; otherwise, use all elements
@@ -116,53 +162,18 @@ def do_something(driver):
                 if not child.is_displayed() or not child.is_enabled() or child in not_clickable_elems:
                     continue
 
-                elem = child
+                element = child
                 break
 
-            if elem is None:
+            if element is None:
                 return None
 
-            driver.execute_script('return arguments[0].scrollIntoView();', elem)
+            driver.execute_script('return arguments[0].scrollIntoView();', element)
             time.sleep(1)
 
-            if elem.tag_name in ['button', 'a']:
-                elem.click()
-            elif elem.tag_name == 'input':
-                input_type = elem.get_attribute('type')
-                if input_type == 'url':
-                    elem.send_keys('http://www.mozilla.org/')
-                elif input_type == 'text':
-                    elem.send_keys('marco')
-                elif input_type == 'email':
-                    elem.send_keys('prova@email.it')
-                elif input_type == 'password':
-                    elem.send_keys('aMildlyComplexPasswordIn2017')
-                elif input_type == 'checkbox':
-                    elem.click()
-                elif input_type == 'number':
-                    elem.send_keys('3')
-                elif input_type in ['submit', 'reset', 'button']:
-                    elem.click()
-                elif input_type == 'color':
-                    driver.execute_script("arguments[0].value = '#ff0000'", elem)
-                elif input_type == 'search':
-                    elem.clear()
-                    elem.send_keys('quick search')
-                elif input_type == 'radio':
-                    elem.click()
-                elif input_type == 'tel':
-                    elem.send_keys('1234567890')
-                elif input_type == 'date':
-                    elem.send_keys('20000101')
-                else:
-                    raise Exception('Unsupported input type: %s' % input_type)
-            elif elem.tag_name == 'select':
-                for option in elem.find_elements(By.TAG_NAME, 'option'):
-                    if option.text != '':
-                        option.click()
-                        break
+            perform_action_on_element(driver, element)
 
-            already_clicked_elems.add(elem)
+            already_clicked_elems.add(element)
 
             close_all_windows_except_first(driver)
 
@@ -178,7 +189,7 @@ def do_something(driver):
             # Ignore frequent exceptions.
             traceback.print_exc(file=sys.stderr)
             close_all_windows_except_first(driver)
-            not_clickable_elems.add(elem)
+            not_clickable_elems.add(element)
 
 
 def get_all_attributes(driver, child):
@@ -208,7 +219,7 @@ def run_in_driver(website, driver):
     for i in range(0, 20):
         print('Iteration {}'.format(i))
         try:
-            elem_attributes = do_something(driver)
+            elem_attributes = perform_action_on_page(driver)
             if elem_attributes is None:
                 print('Cannot find any element to interact with on {}'.format(website))
                 break
