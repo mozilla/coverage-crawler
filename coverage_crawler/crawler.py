@@ -303,4 +303,4 @@ def run(websites):
 
         driver.quit()
 
-        return os.path.abspath(os.path.join(os.getcwd(), '{}/report'.format(data_folder)))
+        return os.path.abspath(os.path.join(os.getcwd(), data_folder))
